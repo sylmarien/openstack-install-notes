@@ -33,6 +33,7 @@ Additional notes:
 - Virtual networks and networks have yet to be defined.
 - Base idea for the architecture: http://www.ubuntu.com/cloud/openstack/reference-architecture
 
+
 ![Alt OpenStack architecture](http://assets.ubuntu.com/sites/ubuntu/1211/u/img/cloud/ubuntu-openstack/reference-architecture/image-servicesvmhigh-medium.png)
 
 ### Diverse notes
