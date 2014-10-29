@@ -51,6 +51,10 @@ Additional notes:
 
 
 
+
+
+
+
 ![Alt OpenStack architecture](http://assets.ubuntu.com/sites/ubuntu/1211/u/img/cloud/ubuntu-openstack/reference-architecture/image-servicesvmhigh-medium.png "OpenStack architecture")
 
 
