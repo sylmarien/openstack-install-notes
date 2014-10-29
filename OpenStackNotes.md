@@ -31,7 +31,7 @@ Additional notes:
 - Storage on a separate machine or on the Controller nodes ? (Cinder, Glance)
 - **Everything run on Ubuntu 14.04.1 Server**  
 - Virtual networks and networks have yet to be defined.
-- Base idea for the architecture: http://www.ubuntu.com/cloud/openstack/reference-architecture
+- Base idea for the architecture: [Ubuntu website](http://www.ubuntu.com/cloud/openstack/reference-architecture "Ubuntu website")
 
 
 ![Alt OpenStack architecture](http://assets.ubuntu.com/sites/ubuntu/1211/u/img/cloud/ubuntu-openstack/reference-architecture/image-servicesvmhigh-medium.png)
