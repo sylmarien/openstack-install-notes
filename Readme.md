@@ -29,6 +29,6 @@ This file contains notes on the Compute node of the architecture. Among others, 
 
 This file contains notes on the Storage node of the architecture. Among others, the purpose of this document is to take track of the OpenStack components, and each modules of these components specifically, that are installed on the Storage node.
 
-#### [Keystone.md](https://github.com/sylmarien/openstack-install-notes/blob/master/keystone.md "Keystone.md")
+#### [Keystone.md](https://github.com/sylmarien/openstack-install-notes/blob/master/Keystone.md)
 
 This file contains notes on the install procedure for the Keystone module of OpenStack.
