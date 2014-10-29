@@ -53,6 +53,7 @@ Additional notes:
 
 ![Alt OpenStack architecture](http://assets.ubuntu.com/sites/ubuntu/1211/u/img/cloud/ubuntu-openstack/reference-architecture/image-servicesvmhigh-medium.png "OpenStack architecture")
 
+
 ### Diverse notes
 Hypervisor : KVM  
 iSCSI ? (Is it the additional component in the servers ? How to use it ? (finding in the doc))  
