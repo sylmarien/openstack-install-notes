@@ -34,7 +34,7 @@ Additional notes:
 - Base idea for the architecture: [Ubuntu website](http://www.ubuntu.com/cloud/openstack/reference-architecture "Ubuntu website")
 
 
-![Alt OpenStack architecture](http://assets.ubuntu.com/sites/ubuntu/1211/u/img/cloud/ubuntu-openstack/reference-architecture/image-servicesvmhigh-medium.png)
+![Alt OpenStack architecture](http://assets.ubuntu.com/sites/ubuntu/1211/u/img/cloud/ubuntu-openstack/reference-architecture/image-servicesvmhigh-medium.png "OpenStack architecture")
 
 ### Diverse notes
 Hypervisor : KVM  
