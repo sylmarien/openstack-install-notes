@@ -32,3 +32,9 @@ This file contains notes on the Storage node of the architecture. Among others, 
 #### [Keystone.md](https://github.com/sylmarien/openstack-install-notes/blob/master/Keystone.md)
 
 This file contains notes on the install procedure for the Keystone module of OpenStack.
+
+#### [Glance.md](https://github.com/sylmarien/openstack-install-notes/blob/master/Glance.md)
+
+This file contains notes on the install procedure for the Glance module of OpenStack.
+
+
