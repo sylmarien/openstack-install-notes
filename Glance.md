@@ -24,10 +24,8 @@ Before you install and configure the Image Service, you must create a database a
     2. Create the glance database:  
     `CREATE DATABASE glance;`
     3. Grant proper access to the glance database:  
-    `GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'localhost' \
-  IDENTIFIED BY 'GLANCE_DBPASS';`  
-  `GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'%' \
-  IDENTIFIED BY 'GLANCE_DBPASS';`  
+    `GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'localhost' IDENTIFIED BY 'GLANCE_DBPASS';`  
+  `GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'%' IDENTIFIED BY 'GLANCE_DBPASS';`  
   Replacing _GLANCE_DBPASS_ with a suitable password.
 2. Source the admin credentials to gain access to admin-only CLI commands:  
 `source admin-openrc.sh`
