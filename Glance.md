@@ -90,7 +90,7 @@ Before you install and configure the Image Service, you must create a database a
         Replacing _GLANCE_PASS_ with the password you chose for the _glance_ user in the Identity service.
 
     3. Configure the local file system store and location of image files:  
-    `glance_store]`  
+    `[glance_store]`  
     `...`  
     `default_store = file`  
     `filesystem_store_datadir = /var/lib/glance/images/`
