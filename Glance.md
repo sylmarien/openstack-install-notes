@@ -83,19 +83,20 @@ Before you install and configure the Image Service, you must create a database a
     `admin_tenant_name = service`  
     `admin_user = glance`  
     `admin_password = GLANCE_PASS`  
-    
-        `[paste_deploy]`  
-        `...`  
-        `flavor = keystone`  
-        Replacing _GLANCE_PASS_ with the password you chose for the _glance_ user in the Identity service.
+    ` `  
+    `[paste_deploy]`  
+    `...`  
+    `flavor = keystone`  
+    Replacing _GLANCE_PASS_ with the password you chose for the _glance_ user in the Identity service.
 
     3. Configure the local file system store and location of image files:  
     `[glance_store]`  
     `...`  
     `default_store = file`  
-    `filesystem_store_datadir = /var/lib/glance/images/`
+    `filesystem_store_datadir = /var/lib/glance/images/`  
+    **_file_ will be changed for the final deployment to support the Object storage or OpenStack.**
     
-    4. Set the logging to verbose for troubleshooting purpose (optional):
+    4. Set the logging to verbose for troubleshooting purpose (optional):  
     `[DEFAULT]`  
     `...`  
     `verbose=True`
@@ -108,4 +109,3 @@ Before you install and configure the Image Service, you must create a database a
     `service glance-api restart`
     2. Remove the unused default SQLite database:  
     `rm -f /var/lib/glance/glance.sqlite`
-

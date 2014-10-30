@@ -27,7 +27,7 @@ As of now, I follow the instructions of the documentation at this page:
     `[database]`  
     `...`  
     `connection = mysql://keystone:KEYSTONE_DBPASS@controller/keystone`  
-    where KEYSTONE_DBPASS is the password dor the database.
+    where _KEYSTONE_DBPASS_ is the password for the database.
     3. Set the logging to verbose for troubleshooting purpose (optional):
     `[DEFAULT]`  
     `...`  
@@ -44,21 +44,21 @@ As of now, I follow the instructions of the documentation at this page:
 #### Configuration steps:
 **Prerequisites:** Configure the temporary access.
 1. Temporary administrative token:   `export OS_SERVICE_TOKEN=ADMIN_TOKEN`  
-where ADMIN_TOKEN is the randomly generated number mentioned before.
+where _ADMIN_TOKEN_ is the randomly generated number mentioned before.
 2. Configure the endpoint:  
 `export OS_SERVICE_ENDPOINT=http://controller:35357/v2.0`
 
 **Tenants, users and roles creation:**
 
 1. Administrative user:
-    1. Admin tenant:  
+    1. Create the _admin_ tenant:  
     `keystone tenant-create --name admin --description "Admin Tenant"`
-    2. Admin user:  
+    2. Create the _admin_ user:  
     `keystone user-create --name admin --pass ADMIN_PASS --email EMAIL_ADDRESS`  
     Replacing ADMIN_PASS and EMAIL_ADDRESS with suitable values.
-    3. Admin role:  
+    3. Create the _admin_ role:  
     `keystone role-create --name admin`
-    4. Add the admin tenant and user to th admin role:  
+    4. Add the _admin_ tenant and user to the _admin_ role:  
     `keystone user-role-add --tenant admin --user admin --role admin`
     5. Create the \_member\_ role and add the admin tenant and user to it (because by default the dashboard limits access to users with the \_member\_ role):  
     `keystone role-create --name _member_`  
@@ -67,10 +67,10 @@ where ADMIN_TOKEN is the randomly generated number mentioned before.
 `keystone tenant-create --name service --description "Service Tenant"`
 3. Typical tenants (to be defined depending of the needs. Example: lcsb and external could be two tenants in which users would be included depending of where they are from). Commands in the case of lcsb tenant:  
 `keystone tenant-create --name lcsb --description "LCSB Tenant"`
-4. Create your users and attach them to the right tenant and to the \_member\_ role (here the user is *username* and the tenant is *lcsb*):  
+4. Create your users and attach them to the right tenant and to the _\_member\__ role (here the user is _username_ and the tenant is _lcsb_):  
 `keystone user-create --name username --pass USERNAME_PASS --email EMAIL_ADDRESS`  
 `keystone user-role-add --tenant lcsb --user username --role _member_`  
-As always, replacing USERNAME_PASS and EMAIL_ADDRESS with the right values.
+As always, replacing _USERNAME_PASS_ and _EMAIL_ADDRESS_ with the right values.
 
 **Service entity and API endpoint**  
 1) The Identity service manages a catalog of services in your OpenStack environment. Services use this catalog to locate other services in your environment.
@@ -92,7 +92,7 @@ At this point, you can use keystone, but the number of arguments to precise is q
 `export OS_USERNAME=admin`  
 `export OS_PASSWORD=ADMIN_PASS`  
 `export OS_AUTH_URL=http://controller:35357/v2.0`  
-Replacing ADMIN_PASS with your admin password.
+Replacing _ADMIN_PASS_ with your admin password.
 
 Do the same for the different users you'd have to login as.
 

@@ -37,4 +37,8 @@ This file contains notes on the install procedure for the Keystone module of Ope
 
 This file contains notes on the install procedure for the Glance module of OpenStack.
 
+#### [Nova.md](https://github.com/sylmarien/openstack-install-notes/blob/master/Nova.md)
+
+This file contains notes on the install procedure for the Nova module of OpenStack.
+
 
