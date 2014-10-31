@@ -19,19 +19,24 @@ As of now, I follow the instructions of the documentation at this page:
 2. Generate random value as temporary administrative token during initial configuration (`openssl rand -hex 10`)
 3. Modify /etc/keystone/keystone.conf to:
     1. Configure temporary admin access:
-    `[DEFAULT]`  
-    `...`  
-    `admin_token=ADMIN_TOKEN`  
+    ```
+    [DEFAULT]
+    ...
+    admin_token=ADMIN_TOKEN
+    ```
     where ADMIN_TOKEN is replaced with the randomly generated number mentioned before.
     2. Configure the access to the database:
-    `[database]`  
-    `...`  
-    `connection = mysql://keystone:KEYSTONE_DBPASS@controller/keystone`  
+    ```
+    [database]
+    ...
+    connection = mysql://keystone:KEYSTONE_DBPASS@controller/keystone
+    ```
     where _KEYSTONE_DBPASS_ is the password for the database.
     3. Set the logging to verbose for troubleshooting purpose (optional):
-    `[DEFAULT]`  
-    `...`  
-    `verbose=True`  
+    ```[DEFAULT]
+    ...
+    verbose=True
+    ```
 4. Populate the Identity service database:  
 `su -s /bin/sh -c "keystone-manage db_sync" keystone`
 5. Restart the Identity service:  
@@ -39,11 +44,14 @@ As of now, I follow the instructions of the documentation at this page:
 6. Remove the unused default SQLite database (created by the package at the installation):  
 `rm -f /var/lib/keystone/keystone.db`
 7. Configure a periodic task using cron to purge expired tokens on an hourly basis (by default, they are kept indefinitely):  
-`(crontab -l -u keystone 2>&1 | grep -q token_flush) || echo '@hourly /usr/bin/keystone-manage token_flush >/var/log/keystone/keystone-tokenflush.log 2>&1' >> /var/spool/cron/crontabs/keystone`
+```
+(crontab -l -u keystone 2>&1 | grep -q token_flush) || echo '@hourly /usr/bin/keystone-manage token_flush >/var/log/keystone/keystone-tokenflush.log 2>&1' >> /var/spool/cron/crontabs/keystone
+```
 
 #### Configuration steps:
 **Prerequisites:** Configure the temporary access.
-1. Temporary administrative token:   `export OS_SERVICE_TOKEN=ADMIN_TOKEN`  
+1. Temporary administrative token:  
+`export OS_SERVICE_TOKEN=ADMIN_TOKEN`  
 where _ADMIN_TOKEN_ is the randomly generated number mentioned before.
 2. Configure the endpoint:  
 `export OS_SERVICE_ENDPOINT=http://controller:35357/v2.0`
@@ -60,16 +68,20 @@ where _ADMIN_TOKEN_ is the randomly generated number mentioned before.
     `keystone role-create --name admin`
     4. Add the _admin_ tenant and user to the _admin_ role:  
     `keystone user-role-add --tenant admin --user admin --role admin`
-    5. Create the \_member\_ role and add the admin tenant and user to it (because by default the dashboard limits access to users with the \_member\_ role):  
-    `keystone role-create --name _member_`  
-    `keystone user-role-add --tenant admin --user admin --role _member_`
+    5. Create the _\_member\__ role and add the admin tenant and user to it (because by default the dashboard limits access to users with the _\_member\__ role):  
+    ```
+    keystone role-create --name _member_
+    keystone user-role-add --tenant admin --user admin --role _member_
+    ```
 2. Service tenant (services also require a tenant):  
 `keystone tenant-create --name service --description "Service Tenant"`
-3. Typical tenants (to be defined depending of the needs. Example: lcsb and external could be two tenants in which users would be included depending of where they are from). Commands in the case of lcsb tenant:  
+3. Typical tenants (to be defined depending of the needs. Example: lcsb and external could be two tenants in which users would be included depending of where they are from). Commands in the case of _lcsb_ tenant:  
 `keystone tenant-create --name lcsb --description "LCSB Tenant"`
 4. Create your users and attach them to the right tenant and to the _\_member\__ role (here the user is _username_ and the tenant is _lcsb_):  
-`keystone user-create --name username --pass USERNAME_PASS --email EMAIL_ADDRESS`  
-`keystone user-role-add --tenant lcsb --user username --role _member_`  
+```
+keystone user-create --name username --pass USERNAME_PASS --email EMAIL_ADDRESS
+keystone user-role-add --tenant lcsb --user username --role _member_
+```
 As always, replacing _USERNAME_PASS_ and _EMAIL_ADDRESS_ with the right values.
 
 **Service entity and API endpoint**  
@@ -81,17 +93,21 @@ OpenStack provides three API endpoint variations for each service: admin, intern
 1. Create the service identity for the Identity service (keystone):  
 `keystone service-create --name keystone --type identity --description "OpenStack Identity"`
 2. Create the API endpoint for the Identity service (Keystone):  
-`keystone endpoint-create --service-id $(keystone service-list | awk '/ identity / {print $2}') --publicurl http://controller:5000/v2.0 --internalurl http://controller:5000/v2.0 --adminurl http://controller:35357/v2.0 --region regionOne`
+```
+keystone endpoint-create --service-id $(keystone service-list | awk '/ identity / {print $2}') --publicurl http://controller:5000/v2.0 --internalurl http://controller:5000/v2.0 --adminurl http://controller:35357/v2.0 --region regionOne
+```
 
 **Client Environment scripts**
 
 At this point, you can use keystone, but the number of arguments to precise is quite long (--os-username admin --os-password passwd .......), so we are going to write scripts that will initialize environment variables so that once sourced, you won't need to precise all these arguments for the ongoing session.
 
-*Admin script: in a file (named for example admin-openrc.sh) write the following*  
-`export OS_TENANT_NAME=admin`  
-`export OS_USERNAME=admin`  
-`export OS_PASSWORD=ADMIN_PASS`  
-`export OS_AUTH_URL=http://controller:35357/v2.0`  
+Admin script: in a file (named for example *admin-openrc.sh*) write the following:
+```bash
+export OS_TENANT_NAME=admin
+export OS_USERNAME=admin
+export OS_PASSWORD=ADMIN_PASS
+export OS_AUTH_URL=http://controller:35357/v2.0
+```
 Replacing _ADMIN_PASS_ with your admin password.
 
 Do the same for the different users you'd have to login as.
