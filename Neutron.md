@@ -195,7 +195,7 @@ Before installing and configure Neutron, we must create a database and Identity 
   apt-get install neutron-plugin-ml2 neutron-plugin-openvswitch-agent neutron-l3-agent neutron-dhcp-agent
   ```
 2. Modify /etc/neutron/neutron.conf to:
-  1. Comment any connection options in the `[DATABASE]` section because network nodes do not directly access the database.
+  1. Comment any _connection_ options in the `[DATABASE]` section because network nodes do not directly access the database.
   2. Configure RabbitMQ message broker access:
   
     ```
@@ -399,3 +399,132 @@ Ideally, you can prevent these problems by enabling jumbo frames on the physical
   service neutron-dhcp-agent restart
   service neutron-metadata-agent restart
   ```
+#### Compute node install
+**Prerequisites:** Before you install and configure OpenStack Networking, you must configure certain kernel networking parameters.
+
+1. Modify /etc/sysctl.conf to add the following parameters:
+
+  ```
+  net.ipv4.conf.all.rp_filter=0
+  net.ipv4.conf.default.rp_filter=0
+  ```
+2. Implement changes:  
+  `sysctl -p`
+
+**Installation and configuration of the Networking components**
+
+1. Install the packages:  
+  `apt-get install neutron-plugin-ml2 neutron-plugin-openvswitch-agent`
+2. Modify /etc/neutron/neutron.conf to:
+  1. Comment any _connection_ options in the `[database]` section because the compute nodes do not directly access the database.
+  2. Configure RabbitMQ message broker access:
+    
+    ```
+    [DEFAULT]
+    ...
+    rpc_backend = rabbit
+    rabbit_host = controller
+    rabbit_password = RABBIT_PASS
+    ```  
+    Replacing _RABBIT_PASS_ with the password you chose for the _guest_ account in RabbitMQ.
+  3. Configure the Identity service access:
+  
+    ```
+    [DEFAULT]
+    ...
+    auth_strategy = keystone
+    ```
+    ```
+    [keystone_authtoken]
+    ...
+    auth_uri = http://controller:5000/v2.0
+    identity_uri = http://controller:35357
+    admin_tenant_name = service
+    admin_user = neutron
+    admin_password = NEUTRON_PASS
+    ```  
+    Replacing _NEUTRON_PASS_ with the password you chose for the _neutron_ user in the Identity service.  
+    **Note:** Comment any auth_host, auth_port, and auth_protocol options because the identity_uri option replaces them.
+  4. Enable the ML2 plug-in, router service and overlapping addresses:
+  
+    ```
+    [DEFAULT]
+    ...
+    core_plugin = ml2
+    service_plugins = router
+    allow_overlapping_ips = True
+    ```
+  5. Set the logging to verbose for troubleshooting purpose (optional):
+  
+    ```
+    [DEFAULT]
+    ...
+    verbose = True
+    ```
+3. Configure the ML2 plug-in. Modify /etc/neutron/plugins/ml2/ml2_conf.ini to:
+  1. Enable the flat and generic routing encapsulation (GRE) network type drivers, GRE tenant networks, and the OVS mechanism driver:
+  
+    ```
+    [ml2]
+    ...
+    type_drivers = flat,gre
+    tenant_network_types = gre
+    mechanism_drivers = openvswitch
+    ```
+  2. Configure the tunnel identifier (id) range:
+  
+    ```
+    [ml2_type_gre]
+    ...
+    tunnel_id_ranges = 1:1000
+    ```
+  3. Enable security groups, enable ipset, and configure the OVS iptables firewall driver:
+  
+    ```
+    [securitygroup]
+    ...
+    enable_security_group = True
+    enable_ipset = True
+    firewall_driver = neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
+    ```
+  4. Configure the Open vSwitch (OVS) agent:
+  
+    ```
+    [ovs]
+    ...
+    local_ip = INSTANCE_TUNNELS_INTERFACE_IP_ADDRESS
+    tunnel_type = gre
+    enable_tunneling = True
+    ```  
+    Replacing _INSTANCE_TUNNELS_INTERFACE_IP_ADDRESS_ with the IP address of the instance tunnels network interface on your compute node. (In this example 10.0.1.31)
+4. Configure the Open vSwitch (OVS) service. Restart the OVS service:  
+  `service openvswitch-switch restart`
+5. Configure Compute to use Networking. By default, distribution packages configure Compute to use legacy networking. You must reconfigure Compute to manage networks through Networking. Modify /etc/nova/nova.conf to:
+  1. Configure the APIs and drivers:
+  
+    ```
+    [DEFAULT]
+    ...
+    network_api_class = nova.network.neutronv2.api.API
+    security_group_api = neutron
+    linuxnet_interface_driver = nova.network.linux_net.LinuxOVSInterfaceDriver
+    firewall_driver = nova.virt.firewall.NoopFirewallDriver
+    ```  
+    **Note:** By default, Compute uses an internal firewall service. Since Networking includes a firewall service, you must disable the Compute firewall service by using the nova.virt.firewall.NoopFirewallDriver firewall driver.
+  2. Configure access parameters:
+  
+    ```
+    [neutron]
+    ...
+    url = http://controller:9696
+    auth_strategy = keystone
+    admin_auth_url = http://controller:35357/v2.0
+    admin_tenant_name = service
+    admin_username = neutron
+    admin_password = NEUTRON_PASS
+    ```  
+    Replacing _NEUTRON_PASS_ with the password you chose for the _neutron_ user in the Identity service.
+6. Restart the Compute service:  
+  `service nova-compute restart`
+7. Restart the Open vSwitch (OVS) agent:  
+  `service neutron-plugin-openvswitch-agent restart`
