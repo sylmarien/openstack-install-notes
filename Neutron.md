@@ -381,7 +381,7 @@ Ideally, you can prevent these problems by enabling jumbo frames on the physical
   3. **On the controller node**, restart the Compute API service:  
     `service nova-api restart`
 6. Configure the Open vSwitch (OVS) service.
-  1. Restart the OVS service:
+  1. Restart the OVS service:  
     `service openvswitch-switch restart`
   2. Add the external bridge:  
     `ovs-vsctl add-br br-ex`
