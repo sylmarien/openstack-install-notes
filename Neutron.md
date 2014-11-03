@@ -322,17 +322,17 @@ Before installing and configure Neutron, we must create a database and Identity 
   Tunneling protocols such as GRE include additional packet headers that increase overhead and decrease space available for the payload or user data. Without knowledge of the virtual network infrastructure, instances attempt to send packets using the default Ethernet maximum transmission unit (MTU) of 1500 bytes. Internet protocol (IP) networks contain the path MTU discovery (PMTUD) mechanism to detect end-to-end MTU and adjust packet size accordingly. However, some operating systems and networks block or otherwise lack support for PMTUD causing performance degradation or connectivity failure.  
 Ideally, you can prevent these problems by enabling jumbo frames on the physical network that contains your tenant virtual networks. Jumbo frames support MTUs up to approximately 9000 bytes which negates the impact of GRE overhead on virtual networks. However, many network devices lack support for jumbo frames and OpenStack administrators often lack control over network infrastructure. Given the latter complications, you can also prevent MTU problems by reducing the instance MTU to account for GRE overhead. Determining the proper MTU value often takes experimentation, but 1454 bytes works in most environments. You can configure the DHCP server that assigns IP addresses to your instances to also adjust the MTU.  
 **Note:** Some cloud images ignore the DHCP MTU option in which case you should configure it using metadata, script, or other suitable method.  
-    1. Modify /etc/neutron/dhcp_agent.ini to enable the dnsmask configuration file:
+      1. Modify /etc/neutron/dhcp_agent.ini to enable the dnsmask configuration file:
     
-      ```
-      [DEFAULT]
-      ...
-      dnsmasq_config_file = /etc/neutron/dnsmasq-neutron.conf
-      ```
-    2. Create and edit /etc/neutron/dhcp_agent.ini to enable the DHCP MTU option (26) and configure it to 1454 bytes:  
+        ```
+        [DEFAULT]
+        ...
+        dnsmasq_config_file = /etc/neutron/dnsmasq-neutron.conf
+        ```
+      2. Create and edit /etc/neutron/dhcp_agent.ini to enable the DHCP MTU option (26) and configure it to 1454 bytes:  
       `dhcp-option-force=26,1454`
-    3. Kill any existing dnsmask processes:  
-      `pkill dnsmask`
+      3. Kill any existing dnsmask processes:  
+        `pkill dnsmask`
 5. Configure the metadata agent.
   1. Modify /etc/neutron/metadata_agent.ini to:
     1. Configure access parameters:
