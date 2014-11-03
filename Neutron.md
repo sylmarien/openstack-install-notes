@@ -539,7 +539,7 @@ Ideally, you can prevent these problems by enabling jumbo frames on the physical
 1. External network. **On the Controller node**  
 The external network typically provides Internet access for your instances. By default, this network only allows Internet access _from_ instances using Network Address Translation (NAT). You can enable Internet access _to_ individual instances using a floating IP address and suitable security group rules. The admin tenant owns this network because it provides external network access for multiple tenants. You must also enable sharing to allow access by those tenants.
   1. Create the external network:
-    1. Source the _dmin_ credentials to gain access to admin-only CLI commands:  
+    1. Source the _admin_ credentials to gain access to admin-only CLI commands:  
       `source admin-openrc.sh`
     2. Create the network:
       
