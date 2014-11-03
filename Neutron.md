@@ -536,4 +536,36 @@ Ideally, you can prevent these problems by enabling jumbo frames on the physical
   `service neutron-plugin-openvswitch-agent restart`
 
 #### Initial networks creation
-
+1. External network. **On the Controller node**  
+The external network typically provides Internet access for your instances. By default, this network only allows Internet access _from_ instances using Network Address Translation (NAT). You can enable Internet access _to_ individual instances using a floating IP address and suitable security group rules. The admin tenant owns this network because it provides external network access for multiple tenants. You must also enable sharing to allow access by those tenants.
+  1. Create the external network:
+    1. Source the _dmin_ credentials to gain access to admin-only CLI commands:  
+      `source admin-openrc.sh`
+    2. Create the network:
+      
+      ```
+      neutron net-create ext-net --shared --router:external True --provider:physical_network external --provider:network_type flat
+      ```
+  2. Create a subnet on the external network:
+    
+    ```
+    neutron subnet-create ext-net --name ext-subnet --allocation-pool start=FLOATING_IP_START,end=FLOATING_IP_END --disable-dhcp --gateway EXTERNAL_NETWORK_GATEWAY EXTERNAL_NETWORK_CIDR
+    ```  
+    Replacing _FLOATING_IP_START_ and _FLOATING_IP_END_ with the first and last IP addresses of the range that you want to allocate for floating IP addresses. Replace _EXTERNAL_NETWORK_CIDR_ with the subnet associated with the physical network. Replace _EXTERNAL_NETWORK_GATEWAY_ with the gateway associated with the physical network, typically the ".1" IP address. You should disable DHCP on this subnet because instances do not connect directly to the external network and floating IP addresses require manual assignment.
+2. Tenant network. **On the Controller node**  
+The tenant network provides internal network access for instances. The architecture isolates this type of network from other tenants. The demo tenant owns this network because it only provides network access for instances within it.
+  1. Create the tenant network:  
+    `neutron net-create demo-net`
+  2. Create a subnet on the tenant network:
+    
+    ```
+    neutron subnet-create demo-net --name demo-subnet --gateway TENANT_NETWORK_GATEWAY TENANT_NETWORK_CIDR
+    ```  
+    Replacing _TENANT_NETWORK_CIDR_ with the subnet you want to associate with the tenant network and _TENANT_NETWORK_GATEWAY_ with the gateway you want to associate with it, typically the ".1" IP address.
+3. Create a router on the tenant network and attach the external and tenant network to it:
+  1. Create the router:
+    `neutron router-create demo-router`
+  2. Attach the router to the demo tenant subnet:  
+    `neutron router-interface-add demo-router demo-subnet`
+  3. Attach the router to the external network by setting it as the gateway:  
+    `neutron router-gateway-set demo-router ext-net`
