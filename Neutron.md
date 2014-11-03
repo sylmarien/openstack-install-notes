@@ -5,6 +5,12 @@
 This file contains notes on the install procedure for the Neutron module of OpenStack.
 Important note: This document currently describe a very generic configuration, it should be adapted to describe the configuration that we will actually deploy. (Will be done as soon as we know more about this configuration)
 
+Go to:  
+[Controller node installation](#controller-node-install)  
+[Network node installation](#network-node-install)  
+[Compute node installation](#compute-node-install)  
+[Initial networks creation](#initial-networks-creation)
+
 ## Install on the nodes
 
 As of now, I follow the instructions of the documentation at this page:  
@@ -528,3 +534,6 @@ Ideally, you can prevent these problems by enabling jumbo frames on the physical
   `service nova-compute restart`
 7. Restart the Open vSwitch (OVS) agent:  
   `service neutron-plugin-openvswitch-agent restart`
+
+#### Initial networks creation
+
