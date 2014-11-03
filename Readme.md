@@ -42,4 +42,6 @@ This file contains notes on the install procedure for the Glance module of OpenS
 
 This file contains notes on the install procedure for the Nova module of OpenStack.
 
+#### [Neutron.md](https://github.com/sylmarien/openstack-install-notes/blob/master/Neutron.md)
 
+This file contains notes on the install procedure for the Neutron module of OpenStack.
