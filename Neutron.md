@@ -33,6 +33,9 @@ http://docs.openstack.org/juno/install-guide/install/apt/content/neutron-control
 - neutron-plugin-ml2
 - neutron-plugin-openvswitch-agent
 
+
+========
+
 #### Controller node install
 **Prerequisites:**  
 Before installing and configure Neutron, we must create a database and Identity service credentials including endpoints
@@ -179,6 +182,9 @@ Before installing and configure Neutron, we must create a database and Identity 
   ```
 6. Restart the Networkin service:  
   `service neutron-server restart`
+
+
+========
 
 #### Network node install
 **Prerequisites:** Before you install and configure OpenStack Networking, you must configure certain kernel networking parameters.
@@ -405,6 +411,10 @@ Ideally, you can prevent these problems by enabling jumbo frames on the physical
   service neutron-dhcp-agent restart
   service neutron-metadata-agent restart
   ```
+  
+  
+========
+  
 #### Compute node install
 **Prerequisites:** Before you install and configure OpenStack Networking, you must configure certain kernel networking parameters.
 
@@ -534,6 +544,9 @@ Ideally, you can prevent these problems by enabling jumbo frames on the physical
   `service nova-compute restart`
 7. Restart the Open vSwitch (OVS) agent:  
   `service neutron-plugin-openvswitch-agent restart`
+
+
+========
 
 #### Initial networks creation
 1. External network. **On the Controller node**  
