@@ -4,7 +4,7 @@
 
 This file contains notes on the Controller node of the architecture. Among others, the purpose of this document is to take track of the OpenStack components, and each modules of these components specifically, that are installed on the Controller node.
 
-# Basic environment
+## Basic environment
 
 The network configuration for this node is the following:  
 4 interfaces:
@@ -71,3 +71,12 @@ Comment any other line.
   2. Remove the /var/lib/ntp/ntp.conf.dhcp file if it exists.
 3. Restart the NTP service:  
   `service ntp restart`
+
+**Basic prerequisites**
+
+1. Install _python-software-properties_ package to ease repository management:  
+  `apt-get install python-software-properties`
+2. Enable the OpenStack repository (seems not necessary on Ubuntu 14.04 since Icehouse is the default version):  
+  `add-apt-repository cloud-archive:icehouse`
+3. Upgrade the packages on the system:  
+  `apt-get update && apt-get dist-upgrade`
