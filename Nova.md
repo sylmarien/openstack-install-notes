@@ -97,8 +97,8 @@ As of now, I follow the instructions of the documentation at this page:
         auth_host = controller
         auth_port = 35357
         auth_protocol = http
-        admin_tenant_name = service`
-        admin_user = nova`
+        admin_tenant_name = service
+        admin_user = nova
         admin_password = NOVA_PASS
         ```
     Replacing _NOVA_PASS_ with the password you chose for the _nova_ user in the Identity service.
@@ -176,8 +176,8 @@ As of now, I follow the instructions of the documentation at this page:
         auth_host = controller
         auth_port = 35357
         auth_protocol = http
-        admin_tenant_name = service`
-        admin_user = nova`
+        admin_tenant_name = service
+        admin_user = nova
         admin_password = NOVA_PASS
         ```
     Replacing _NOVA_PASS_ with the password you chose for the nova user in the Identity service.
