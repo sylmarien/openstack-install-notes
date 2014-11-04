@@ -76,9 +76,8 @@ Before you install and configure the Image Service, you must create a database a
         [paste_deploy]
         ...  
         flavor = keystone
-        ```
-    Replacing _GLANCE_PASS_ with the password you chose for the _glance_ user in the Identity service.
-
+        ```  
+        Replacing _GLANCE_PASS_ with the password you chose for the _glance_ user in the Identity service.
     3. Set the logging to verbose for troubleshooting purpose (optional):
     
     ```
@@ -89,12 +88,12 @@ Before you install and configure the Image Service, you must create a database a
 3. Modify /etc/glance/glance-registry.conf to:
     1. Configure database access:
     
-    ```
-    [database]
-    ...
-    connection = mysql://glance:GLANCE_DBPASS@controller/glance
-    ```
-    Replacing _GLANCE_DBPASS_ with the password you chose for the Image Service database.
+        ```
+        [database]
+        ...
+        connection = mysql://glance:GLANCE_DBPASS@controller/glance
+        ```  
+        Replacing _GLANCE_DBPASS_ with the password you chose for the Image Service database.
     2. Configure the Identity service access:
     
         ```
@@ -112,8 +111,8 @@ Before you install and configure the Image Service, you must create a database a
         [paste_deploy]
         ...
         flavor = keystone
-        ```
-    Replacing _GLANCE_PASS_ with the password you chose for the _glance_ user in the Identity service.
+        ```  
+        Replacing _GLANCE_PASS_ with the password you chose for the _glance_ user in the Identity service.
     3. Configure the local file system store and location of image files:
     
         ```
