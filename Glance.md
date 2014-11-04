@@ -64,8 +64,10 @@ Before you install and configure the Image Service, you must create a database a
         ```
         [keystone_authtoken]
         ...
-        auth_uri = http://controller:5000/v2.0
-        identity_uri = http://controller:35357
+        auth_uri = http://controller:5000
+        auth_host = controller
+        auth_port = 35357
+        auth_protocol = http
         admin_tenant_name = service
         admin_user = glance
         admin_password = GLANCE_PASS
@@ -99,8 +101,10 @@ Before you install and configure the Image Service, you must create a database a
         ```
         [keystone_authtoken]
         ...
-        auth_uri = http://controller:5000/v2.0
-        identity_uri = http://controller:35357
+        auth_uri = http://controller:5000
+        auth_host = controller
+        auth_port = 35357
+        auth_protocol = http
         admin_tenant_name = service
         admin_user = glance
         admin_password = GLANCE_PASS
@@ -115,7 +119,7 @@ Before you install and configure the Image Service, you must create a database a
     3. Configure the local file system store and location of image files:
     
         ```
-        [glance_store]
+        [DEFAULT]
         ...
         default_store = file
         filesystem_store_datadir = /var/lib/glance/images/
