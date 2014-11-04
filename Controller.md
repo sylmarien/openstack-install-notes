@@ -13,7 +13,7 @@ The network configuration for this node is the following:
 
 **Configure networking**
 
-Configure eth1:
+1. Modify /etc/network/interfaces to configure eth1:
 
   ```
   # Management network
@@ -23,3 +23,16 @@ Configure eth1:
   netmask 255.255.255.0
   gateway 10.10.10.1
   ```
+2. Modify /etc/hosts to configure the name resolution:
+
+  ```
+  # controller
+  10.10.10.11       controller
+
+  # network
+  10.10.10.21       network
+
+  # compute1
+  10.10.10.31       compute1
+  ```  
+  Comment any other line.
