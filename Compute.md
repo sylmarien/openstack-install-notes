@@ -72,3 +72,9 @@ The network configuration for this node is the following:
   `add-apt-repository cloud-archive:icehouse`
 3. Upgrade the packages on the system:  
   `apt-get update && apt-get dist-upgrade`
+
+**Database**
+
+*Peut-être inutile !*
+Install the packages:  
+  `apt-get install mariadb-client python-mysqldb`
