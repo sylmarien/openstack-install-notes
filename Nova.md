@@ -93,8 +93,10 @@ As of now, I follow the instructions of the documentation at this page:
         ```
         [keystone_authtoken]
         ...
-        auth_uri = http://controller:5000/v2.0
-        identity_uri = http://controller:35357
+        auth_uri = http://controller:5000
+        auth_host = controller
+        auth_port = 35357
+        auth_protocol = http
         admin_tenant_name = service`
         admin_user = nova`
         admin_password = NOVA_PASS
@@ -119,9 +121,9 @@ As of now, I follow the instructions of the documentation at this page:
     6. Configure the location of the Image service:
     
         ```
-        [glance]
+        [DEFAULT]
         ...
-        host = controller
+        glance_host = controller
         ```
     7. Set the logging to verbose for troubleshooting purpose (optional):
     
@@ -169,10 +171,12 @@ As of now, I follow the instructions of the documentation at this page:
         ```
         [keystone_authtoken]
         ...
-        auth_uri = http://controller:5000/v2.0
-        identity_uri = http://controller:35357
-        admin_tenant_name = service
-        admin_user = nova
+        auth_uri = http://controller:5000
+        auth_host = controller
+        auth_port = 35357
+        auth_protocol = http
+        admin_tenant_name = service`
+        admin_user = nova`
         admin_password = NOVA_PASS
         ```
     Replacing _NOVA_PASS_ with the password you chose for the nova user in the Identity service.  
@@ -200,9 +204,9 @@ As of now, I follow the instructions of the documentation at this page:
     5. Configure the location of the Image service:
     
         ```
-        [glance]
+        [DEFAULT]
         ...
-        host = controller
+        glance_host = controller
         ```
     6. Set the logging to verbose for troubleshooting purpose (optional):
     
