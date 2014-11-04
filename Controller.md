@@ -80,6 +80,20 @@ We use MariaDB to manage the SQL database.
     init-connect = 'SET NAMES utf8'
     character-set-server = utf8
     ```
+  3. MariaDB misplaces by default the mysqld.sock location, so modify /etc/mysql/my.cnf:
+  
+    ```
+    [client]
+    socket = /tmp/mysqld.sock
+    ```
+    ```
+    [mysqld_safe]
+    socket = /tmp/mysqld.sock
+    ```
+    ```
+    [mysqld]
+    socket = /tmp/mysqld.sock
+    ```
 4. Restart the database service:  
   `service mysql restart`
 5. Secure the database service:  
