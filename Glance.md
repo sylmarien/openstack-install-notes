@@ -86,7 +86,6 @@ Before you install and configure the Image Service, you must create a database a
     ...
     verbose=True
     ```
-    
 3. Modify /etc/glance/glance-registry.conf to:
     1. Configure database access:
     
@@ -115,7 +114,6 @@ Before you install and configure the Image Service, you must create a database a
         flavor = keystone
         ```
     Replacing _GLANCE_PASS_ with the password you chose for the _glance_ user in the Identity service.
-
     3. Configure the local file system store and location of image files:
     
         ```
