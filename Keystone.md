@@ -29,7 +29,9 @@ As of now, I follow the instructions of the documentation at this page:
     Replacing _KEYSTONE_DBPASS_ with a suitable password.
 2. Generate random value as temporary administrative token during initial configuration:  
     `openssl rand -hex 10`
-3. Modify /etc/keystone/keystone.conf to:
+3. Install the packages:  
+    `apt-get install keystone python-keystoneclient`
+4. Modify /etc/keystone/keystone.conf to:
     1. Configure temporary admin access:
     
         ```
@@ -53,13 +55,13 @@ As of now, I follow the instructions of the documentation at this page:
         ...
         verbose=True
         ```
-4. Populate the Identity service database:  
+5. Populate the Identity service database:  
     `su -s /bin/sh -c "keystone-manage db_sync" keystone`
-5. Restart the Identity service:  
+6. Restart the Identity service:  
     `service keystone restart`
-6. Remove the unused default SQLite database (created by the package at the installation):  
+7. Remove the unused default SQLite database (created by the package at the installation):  
     `rm -f /var/lib/keystone/keystone.db`
-7. Configure a periodic task using cron to purge expired tokens on an hourly basis (by default, they are kept indefinitely):
+8. Configure a periodic task using cron to purge expired tokens on an hourly basis (by default, they are kept indefinitely):
 
     ```
     (crontab -l -u keystone 2>&1 | grep -q token_flush) || echo '@hourly /usr/bin/keystone-manage token_flush >/var/log/keystone/keystone-tokenflush.log 2>&1' >> /var/spool/cron/crontabs/keystone
