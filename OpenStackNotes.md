@@ -44,4 +44,5 @@ RabbitMQ needs the line "127.0.0.1  ubuntu" in /etc/hosts to work properly even 
 MariaDB misplaces by default the mysqld.sock location, so change the "sock" lines (in /etc/mysql/my.conf) to /tmp/mysqld.sock
 
 Network Architecture on the VM install:  
+Except that the controller node isn't on the API network.  
 ![Alt network architecture](http://docs.openstack.org/training-guides/content/figures/1/a/figures/lab_virtual-box/image03.png)
