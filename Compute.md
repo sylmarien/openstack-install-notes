@@ -61,3 +61,12 @@ The network configuration for this node is the following:
   2. Remove the /var/lib/ntp/ntp.conf.dhcp file if it exists.
 3. Restart the NTP service:  
   `service ntp restart`
+
+**Basic prerequisites**
+
+1. Install _python-software-properties_ package to ease repository management:  
+  `apt-get install python-software-properties`
+2. Enable the OpenStack repository (seems not necessary on Ubuntu 14.04 since Icehouse is the default version):  
+  `add-apt-repository cloud-archive:icehouse`
+3. Upgrade the packages on the system:  
+  `apt-get update && apt-get dist-upgrade`
