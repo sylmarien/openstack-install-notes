@@ -36,3 +36,4 @@ The network configuration for this node is the following:
   10.10.10.31       compute1
   ```  
   Comment any other line.
+3. Reboot to activate changes.
