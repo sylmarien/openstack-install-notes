@@ -101,8 +101,10 @@ Before installing and configure Neutron, we must create a database and Identity 
     ```
     [keystone_authtoken]
     ...
-    auth_uri = http://controller:5000/v2.0
-    identity_uri = http://controller:35357
+    auth_uri = http://controller:5000
+    auth_host = controller
+    auth_port = 35357
+    auth_protocol = http
     admin_tenant_name = service
     admin_user = neutron
     admin_password = NEUTRON_PASS
