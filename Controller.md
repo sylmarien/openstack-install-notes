@@ -38,3 +38,8 @@ The network configuration for this node is the following:
   ```  
   Comment any other line.
 3. Reboot to activate changes.
+
+**Configure NTP**
+
+Install the NTP service:  
+  `apt-get install ntp`
