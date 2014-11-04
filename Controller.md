@@ -16,7 +16,10 @@ The network configuration for this node is the following:
 Configure eth1:
 
   ```
-  IP address : 10.10.10.11
+  # Management network
+  auto eth1
+  iface eth1 inet static
+  address 10.10.10.11
   netmask 255.255.255.0
   gateway 10.10.10.1
   ```
