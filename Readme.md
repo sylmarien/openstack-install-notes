@@ -18,13 +18,17 @@ Especially, it follows the documentation for the Juno release, but we may decide
 This file contains diverses notes and comments on the installation as a whole. Its main purpose is to describe the architecture and some specificity it could have.  
 During the development period it also contains reminders on topics to dig further and reflexions I'm having that may (or may not) make it to the implementation/release.
 
-#### Controller.md
+#### [Controller.md](https://github.com/sylmarien/openstack-install-notes/blob/master/Controller.md)
 
 This file contains notes on the Controller node of the architecture. Among others, the purpose of this document is to take track of the OpenStack components, and each modules of these components specifically, that are installed on the Controller node.
 
-#### Compute.md
+#### [Compute.md](https://github.com/sylmarien/openstack-install-notes/blob/master/Compute.md)
 
 This file contains notes on the Compute node of the architecture. Among others, the purpose of this document is to take track of the OpenStack components, and each modules of these components specifically, that are installed on the Compute node.
+
+### [Network.md](https://github.com/sylmarien/openstack-install-notes/blob/master/Network.md)
+
+This file contains notes on the Network node of the architecture. Among others, the purpose of this document is to take track of the OpenStack components, and each modules of these components specifically, that are installed on the Network node.
 
 #### Storage.md (Exists ? To be decided)
 
