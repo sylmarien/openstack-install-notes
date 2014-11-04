@@ -50,3 +50,14 @@ The network configuration for this node is the following:
   ```  
   Comment any other line.
 3. Reboot to activate changes.
+
+**Configure NTP**
+
+1. Install the NTP service:  
+  `apt-get install ntp`
+2. Configure the NTP service:
+  1. Modify /etc/ntp.conf to comment or remove all server key but one to reference the controller node:  
+    `server controller iburst`
+  2. Remove the /var/lib/ntp/ntp.conf.dhcp file if it exists.
+3. Restart the NTP service:  
+  `service ntp restart`
