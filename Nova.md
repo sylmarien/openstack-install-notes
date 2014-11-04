@@ -101,8 +101,7 @@ As of now, I follow the instructions of the documentation at this page:
         admin_user = nova`
         admin_password = NOVA_PASS
         ```
-    Replacing _NOVA_PASS_ with the password you chose for the _nova_ user in the Identity service.  
-    *Comment any auth_host, auth_port, and auth_protocol options because the identity_uri option replaces them.*
+    Replacing _NOVA_PASS_ with the password you chose for the _nova_ user in the Identity service.
     4. Configure the IP to be the management interface IP address of the Controller node:
     
         ```
@@ -179,8 +178,7 @@ As of now, I follow the instructions of the documentation at this page:
         admin_user = nova`
         admin_password = NOVA_PASS
         ```
-    Replacing _NOVA_PASS_ with the password you chose for the nova user in the Identity service.  
-    *Comment any auth_host, auth_port, and auth_protocol options because the identity_uri option replaces them.*
+    Replacing _NOVA_PASS_ with the password you chose for the nova user in the Identity service.
     3. Configure _my_ip_ to be the IP address of the management interface of this Compute node:
     
         ```
