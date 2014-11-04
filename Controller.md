@@ -6,7 +6,7 @@ This file contains notes on the Controller node of the architecture. Among other
 # Basic environment
 
 The network configuration for this node is the following:  
-3 interfaces:
+2 interfaces:
 
 - eth0 : NAT
 - eth1 : management network (on subnet 10.10.10.0/24)
