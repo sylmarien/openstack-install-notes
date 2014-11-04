@@ -122,7 +122,7 @@ Before you install and configure the Image Service, you must create a database a
         default_store = file
         filesystem_store_datadir = /var/lib/glance/images/
         ```  
-    **_file_ will be changed for the final deployment to support the Object storage or OpenStack.**
+        **_file_ will be changed for the final deployment to support the Object storage or OpenStack.**
     4. Set the logging to verbose for troubleshooting purpose (optional):
     
         ```
