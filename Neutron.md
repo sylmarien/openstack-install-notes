@@ -143,8 +143,10 @@ Before installing and configure Neutron, we must create a database and Identity 
     ...
     verbose = True
     ```
+  
+  ** Configure ML2 here !**
 3. By default, distribution packages configure Compute to use legacy networking. You must reconfigure Compute to manage networks through Networking. Modify /etc/nova/nova.conf to:
-  1. Configure the APIs and drivers:
+  1. Configure the APIs and drivers: **(modified ?)**
   
     ```
     [DEFAULT]
@@ -155,7 +157,7 @@ Before installing and configure Neutron, we must create a database and Identity 
     firewall_driver = nova.virt.firewall.NoopFirewallDriver
     ```  
     Note: By default, Compute uses an internal firewall service. Since Networking includes a firewall service, you must disable the Compute firewall service by using the nova.virt.firewall.NoopFirewallDriver firewall driver.
-  2. Configure access parameters:
+  2. Configure access parameters: **(deleted ?)**
   
     ```
     [neutron]
