@@ -31,8 +31,8 @@ The network configuration for this node is the following:
     
     ```
     # Instance tunnels interface
-    auto eth1
-    iface eth1 inet static
+    auto eth2
+    iface eth2 inet static
     address 10.20.20.21
     netmask 255.255.255.0
     ```
@@ -41,9 +41,12 @@ The network configuration for this node is the following:
     ```
     # External network interface
     auto eth3
-    iface eth3 inet manual
-        up ip link set dev $IFACE up
-        down ip link set dev $IFACE down
+    iface eth3 inet static
+    address 192.168.100.21
+    netmask 255.255.255.0
+    #iface eth3 inet manual
+    #    up ip link set dev $IFACE up
+    #    down ip link set dev $IFACE down
     ```
 2. Modify /etc/hosts to configure the name resolution:
 
