@@ -25,7 +25,8 @@ The network configuration for this node is the following:
     iface eth1 inet static
     address 10.10.10.21
     netmask 255.255.255.0
-    gateway 10.10.10.1
+    # On VM, no gateway because it is set by the DHCP on the NAT interface
+    #gateway 10.10.10.1
     ```
   2. eth2 :
     
@@ -41,12 +42,9 @@ The network configuration for this node is the following:
     ```
     # External network interface
     auto eth3
-    iface eth3 inet static
-    address 192.168.100.21
-    netmask 255.255.255.0
-    #iface eth3 inet manual
-    #    up ip link set dev $IFACE up
-    #    down ip link set dev $IFACE down
+    iface eth3 inet manual
+        up ip link set dev $IFACE up
+        down ip link set dev $IFACE down
     ```
 2. Modify /etc/hosts to configure the name resolution:
 
