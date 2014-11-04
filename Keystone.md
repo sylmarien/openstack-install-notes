@@ -16,7 +16,19 @@ As of now, I follow the instructions of the documentation at this page:
 
 #### Install steps:
 1. Create and configure database
-2. Generate random value as temporary administrative token during initial configuration (`openssl rand -hex 10`)
+    1. Connect to the database as the _root_ user:  
+        `mysql -u root -p`
+    2. Create the glance database:  
+        `CREATE DATABASE keystone;`
+    3. Grant proper access to the glance database:
+    
+        ```
+        GRANT ALL PRIVILEGES ON glance.* TO 'keystone'@'localhost' IDENTIFIED BY 'KEYSTONE_DBPASS';
+        GRANT ALL PRIVILEGES ON glance.* TO 'keystone'@'%' IDENTIFIED BY 'KEYSTONE_DBPASS';
+        ```  
+    Replacing _KEYSTONE_DBPASS_ with a suitable password.
+2. Generate random value as temporary administrative token during initial configuration:  
+    `openssl rand -hex 10`
 3. Modify /etc/keystone/keystone.conf to:
     1. Configure temporary admin access:
     
