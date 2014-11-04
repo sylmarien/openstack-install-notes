@@ -42,3 +42,6 @@ Hypervisor : KVM
 iSCSI ? (Is it the additional component in the servers ? How to use it ? (finding in the doc))  
 RabbitMQ needs the line "127.0.0.1  ubuntu" in /etc/hosts to work properly even though the doc ask us to comment it. Would it be a problem later to let that uncommented ?  
 MariaDB misplaces by default the mysqld.sock location, so change the "sock" lines (in /etc/mysql/my.conf) to /tmp/mysqld.sock
+
+Network Architecture on the VM install:  
+![Alt network architecture](http://docs.openstack.org/training-guides/content/figures/1/a/figures/lab_virtual-box/image03.png)
