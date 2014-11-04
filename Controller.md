@@ -21,7 +21,8 @@ The network configuration for this node is the following:
   iface eth1 inet static
   address 10.10.10.11
   netmask 255.255.255.0
-  gateway 10.10.10.1
+  # On VM, no gateway because it is set by the DHCP on the NAT interface
+  # gateway 10.10.10.1
   ```
 2. Modify /etc/hosts to configure the name resolution:
 
