@@ -23,8 +23,8 @@ As of now, I follow the instructions of the documentation at this page:
     3. Grant proper access to the glance database:
     
         ```
-        GRANT ALL PRIVILEGES ON glance.* TO 'keystone'@'localhost' IDENTIFIED BY 'KEYSTONE_DBPASS';
-        GRANT ALL PRIVILEGES ON glance.* TO 'keystone'@'%' IDENTIFIED BY 'KEYSTONE_DBPASS';
+        GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'localhost' IDENTIFIED BY 'KEYSTONE_DBPASS';
+        GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'%' IDENTIFIED BY 'KEYSTONE_DBPASS';
         ```  
     Replacing _KEYSTONE_DBPASS_ with a suitable password.
 2. Generate random value as temporary administrative token during initial configuration:  
