@@ -4,6 +4,8 @@
 
 This file contains notes on the Controller node of the architecture. Among others, the purpose of this document is to take track of the OpenStack components, and each modules of these components specifically, that are installed on the Controller node.
 
+**During development, all passwords are _kikoo_.**
+
 ## Basic environment
 
 The network configuration for this node is the following:  
