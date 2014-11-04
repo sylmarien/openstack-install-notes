@@ -48,7 +48,15 @@ As of now, I follow the instructions of the documentation at this page:
         connection = mysql://keystone:KEYSTONE_DBPASS@controller/keystone
         ```
     where _KEYSTONE_DBPASS_ is the password for the database.
-    3. Set the logging to verbose for troubleshooting purpose (optional):
+    3. Configure the UUID token provider and SQL driver:
+    
+        ```
+        [token]
+        ...
+        provider = keystone.token.providers.uuid.Provider
+        driver = keystone.token.persistence.backends.sql.Token
+        ```
+    4. Set the logging to verbose for troubleshooting purpose (optional):
     
         ```
         [DEFAULT]
