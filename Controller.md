@@ -16,7 +16,7 @@ The network configuration for this node is the following:
 1. Modify /etc/network/interfaces to configure eth1:
 
   ```
-  # Management network
+  # Management network interface
   auto eth1
   iface eth1 inet static
   address 10.10.10.11
