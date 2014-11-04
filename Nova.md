@@ -107,16 +107,18 @@ As of now, I follow the instructions of the documentation at this page:
         ```
         [DEFAULT]
         ...
-        my_ip = 10.0.0.11
-        ```
+        my_ip = MANAGEMENT_IP_ADDRESS
+        ```  
+        Replacing _MANAGEMENT_IP_ADDRESS_ with the IP address of the management interface. (10.10.10.11 in our example).
     5. Configure the VNC proxy to use the managament interface IP address of the Controller node:
     
         ```
         [DEFAULT]
         ...
-        vncserver_listen = 10.0.0.11
-        vncserver_proxyclient_address = 10.0.0.11
-        ```
+        vncserver_listen = MANAGEMENT_IP_ADDRESS
+        vncserver_proxyclient_address = MANAGEMENT_IP_ADDRESS
+        ```  
+        Replacing _MANAGEMENT_IP_ADDRESS_ with the IP address of the management interface. (10.10.10.11 in our example).
     6. Configure the location of the Image service:
     
         ```
@@ -186,7 +188,7 @@ As of now, I follow the instructions of the documentation at this page:
         ...
         my_ip = MANAGEMENT_INTERFACE_IP_ADDRESS
         ```
-    Replacing _MANAGEMENT_INTERFACE_IP_ADDRESS_ with the IP address of the management interface of the compute node. (In this example 10.0.0.31)
+    Replacing _MANAGEMENT_INTERFACE_IP_ADDRESS_ with the IP address of the management interface of the compute node. (In this example 10.10.10.31)
     4. Enable and configure remote console access:
     
         ```
@@ -198,7 +200,7 @@ As of now, I follow the instructions of the documentation at this page:
         novncproxy_base_url = http://controller:6080/vnc_auto.html
         ```
     The server component listens on all IP addresses and the proxy component only listens on the management interface IP address of the compute node. The base URL indicates the location where you can use a web browser to access remote consoles of instances on this compute node.  
-    Replacing _MANAGEMENT_INTERFACE_IP_ADDRESS_ with the IP address of the management interface of the compute node. (In this example 10.0.0.31)
+    Replacing _MANAGEMENT_INTERFACE_IP_ADDRESS_ with the IP address of the management interface of the compute node. (In this example 10.10.10.31)
     5. Configure the location of the Image service:
     
         ```
