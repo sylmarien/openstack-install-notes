@@ -127,12 +127,12 @@ At this point, you can use keystone, but the number of arguments to precise is q
 
 Admin script: in a file (named for example *admin-openrc.sh*) write the following:
 
-    ```bash
-    export OS_TENANT_NAME=admin
-    export OS_USERNAME=admin
-    export OS_PASSWORD=ADMIN_PASS
-    export OS_AUTH_URL=http://controller:35357/v2.0
-    ```
+```bash
+export OS_TENANT_NAME=admin
+export OS_USERNAME=admin
+export OS_PASSWORD=ADMIN_PASS
+export OS_AUTH_URL=http://controller:35357/v2.0
+```  
 Replacing _ADMIN_PASS_ with your admin password.
 
 Do the same for the different users you'd have to login as.
