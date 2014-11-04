@@ -11,7 +11,7 @@ As of now, I follow the instructions of the documentation at this page:
 [Nova Install in the OpenStack documentation](http://docs.openstack.org/juno/install-guide/install/apt/content/ch_nova.html)
 
 Go to:  
-[Controller node install](https://github.com/sylmarien/openstack-install-notes/blob/master/Nova.md#controller-node-install)
+[Controller node install](https://github.com/sylmarien/openstack-install-notes/blob/master/Nova.md#controller-node-install)  
 [Compute node install](https://github.com/sylmarien/openstack-install-notes/blob/master/Nova.md#compute-node-install)
 
 #### List of installed modules by node
