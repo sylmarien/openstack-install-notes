@@ -93,7 +93,8 @@ where _ADMIN_TOKEN_ is the randomly generated number mentioned before.
         ```
         keystone role-create --name _member_
         keystone user-role-add --tenant admin --user admin --role _member_
-        ```
+        ```  
+        Note that the _\_member\__ role may be created by default, then the first command will return an error.
 2. Service tenant (services also require a tenant):  
     `keystone tenant-create --name service --description "Service Tenant"`
 3. Typical tenants (to be defined depending of the needs. Example: lcsb and external could be two tenants in which users would be included depending of where they are from). Commands in the case of _lcsb_ tenant:  
