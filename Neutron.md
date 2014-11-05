@@ -86,7 +86,7 @@ Before installing and configure Neutron, we must create a database and Identity 
     ```
     [DEFAULT]
     ...
-    rpc_backend = rabbit
+    rpc_backend = neutron.openstack.common.rpc.impl_kombu
     rabbit_host = controller
     rabbit_password = RABBIT_PASS
     ```  
@@ -244,7 +244,7 @@ Unlike other services, Networking typically does not require a separate step to 
   
     ```
     [DEFAULT]
-    rpc_backend = rabbit
+    rpc_backend = neutron.openstack.common.rpc.impl_kombu
     rabbit_host = controller
     rabbit_password = RABBIT_PASS
     ```  
@@ -469,7 +469,7 @@ Ideally, you can prevent these problems by enabling jumbo frames on the physical
     ```
     [DEFAULT]
     ...
-    rpc_backend = rabbit
+    rpc_backend = neutron.openstack.common.rpc.impl_kombu
     rabbit_host = controller
     rabbit_password = RABBIT_PASS
     ```  
