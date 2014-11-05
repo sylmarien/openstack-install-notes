@@ -145,10 +145,8 @@ Before installing and configure Neutron, we must create a database and Identity 
     ...
     verbose = True
     ```
-  
-  ** Configure ML2 here !**
 3. By default, distribution packages configure Compute to use legacy networking. You must reconfigure Compute to manage networks through Networking. Modify /etc/nova/nova.conf to:
-  1. Configure the APIs and drivers: **(modified ?)**
+  1. Configure the APIs and drivers:
   
     ```
     [DEFAULT]
@@ -159,24 +157,39 @@ Before installing and configure Neutron, we must create a database and Identity 
     firewall_driver = nova.virt.firewall.NoopFirewallDriver
     ```  
     Note: By default, Compute uses an internal firewall service. Since Networking includes a firewall service, you must disable the Compute firewall service by using the nova.virt.firewall.NoopFirewallDriver firewall driver.
-  2. Configure access parameters: **(deleted ?)**
+  2. Configure access parameters:
   
     ```
-    [neutron]
+    [DEFAULT]
     ...
-    url = http://controller:9696
-    auth_strategy = keystone
-    admin_auth_url = http://controller:35357/v2.0
-    admin_tenant_name = service
-    admin_username = neutron
-    admin_password = NEUTRON_PASS
+    neutron_url = http://controller:9696
+    neutron_auth_strategy = keystone
+    neutron_admin_auth_url = http://controller:35357/v2.0
+    neutron_admin_tenant_name = service
+    neutron_admin_username = neutron
+    neutron_admin_password = NEUTRON_PASS
     ```  
     Replacing _NEUTRON_PASS_ with the password you chose for the _neutron_ user in the Identity service.
-4. Populate the database:
-
-  ```
-  su -s /bin/sh -c "neutron-db-manage --config-file /etc/neutron/neutron.conf --config-file /etc/neutron/plugins/ml2/ml2_conf.ini upgrade juno" neutron
-  ```
+4. Configure ML2 plug-in. Modify /etc/neutron/plugins/ml2/ml2_conf.ini to add the following keys:
+    
+    ```
+    [ml2]
+    ...
+    type_drivers = flat,gre
+    tenant_network_types = gre
+    mechanism_drivers = openvswitch
+    ```
+    ```
+    [ml2_type_gre]
+    ...
+    tunnel_id_ranges = 1:1000
+    ```
+    ```
+    [securitygroup]
+    ...
+    firewall_driver = neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
+    enable_security_group = True
+    ```
 5. Restart the Compute services:
 
   ```
@@ -187,6 +200,21 @@ Before installing and configure Neutron, we must create a database and Identity 
 6. Restart the Networkin service:  
   `service neutron-server restart`
 
+**Troubleshooting**  
+Unlike other services, Networking typically does not require a separate step to populate the database because the _neutron-server_ service populates it automatically. However, the packages for these distributions sometimes require running the _neutron-db-manage_ command prior to starting the _neutron-server_ service. We recommend attempting to start the service before manually populating the database. If the service returns database errors, perform the following operations:
+
+1. Configure Networking to use long plug-in names:
+
+  ```
+  openstack-config --set /etc/neutron/neutron.conf DEFAULT core_plugin neutron.plugins.ml2.plugin.Ml2Plugin
+  openstack-config --set /etc/neutron/neutron.conf DEFAULT service_plugins neutron.services.l3_router.l3_router_plugin.L3RouterPlugin
+  ```
+2.Populate the database:
+
+  ```
+  su -s /bin/sh -c "neutron-db-manage --config-file /etc/neutron/neutron.conf --config-file /etc/neutron/plugins/ml2/ml2_conf.ini upgrade icehouse" neutron
+  ```
+3. Attempt to start the _neutron-server_ service again. You can return the _core_plugin_ and _service_plugins_ configuration keys to short plug-in names.
 
 ========
 
@@ -279,13 +307,12 @@ Before installing and configure Neutron, we must create a database and Identity 
     ...
     tunnel_id_ranges = 1:1000
     ```
-  4. Enable security groups and ipset and configure the OVS iptables firewall drivers:
+  4. Enable security groups and configure the OVS iptables firewall drivers:
   
     ```
     [securitygroup]
     ...
     enable_security_group = True
-    enable_ipset = True
     firewall_driver = neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
     ```
   5. Configure the Open vSwitch (OVS) agent:
