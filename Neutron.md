@@ -414,14 +414,17 @@ Ideally, you can prevent these problems by enabling jumbo frames on the physical
     Replacing _METADATA_SECRET_ with the secret you chose for the metadata proxy.
   3. **On the controller node**, restart the Compute API service:  
     `service nova-api restart`
-6. Configure the Open vSwitch (OVS) service.
+6. Configure the Open vSwitch (OVS) service.  
+The OVS service provides the underlying virtual networking framework for instances. The integration bridge br-int handles internal instance network traffic within OVS. The external bridge br-ex handles external instance network traffic within OVS. The external bridge requires a port on the physical external network interface to provide instances with external network access. In essence, this port bridges the virtual and physical external networks in your environment.
   1. Restart the OVS service:  
     `service openvswitch-switch restart`
-  2. Add the external bridge:  
+  2. Add the integration bridge:  
+    `ovs-vsctl add-br br-int`
+  3. Add the external bridge:  
     `ovs-vsctl add-br br-ex`
-  3. Add a port to the external bridge that connects to the physical external network interface:  
+  4. Add a port to the external bridge that connects to the physical external network interface:  
     `ovs-vsctl add-port br-ex INTERFACE_NAME`  
-  Replacing _INTERFACE_NAME_ with the actual interface name (for example _eth2_)  
+  Replacing _INTERFACE_NAME_ with the actual interface name (in this example _eth3_)  
   **Note:** Depending on your network interface driver, you may need to disable generic receive offload (GRO) to achieve suitable throughput between your instances and the external network.  
   To temporarily disable GRO on the external network interface while testing your environment:  
     `ethtool -K INTERFACE_NAME gro off`
