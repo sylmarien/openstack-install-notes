@@ -520,13 +520,12 @@ The OVS service provides the underlying virtual networking framework for instanc
     ...
     tunnel_id_ranges = 1:1000
     ```
-  3. Enable security groups, enable ipset, and configure the OVS iptables firewall driver:
+  3. Enable security groups and configure the OVS iptables firewall driver:
   
     ```
     [securitygroup]
     ...
     enable_security_group = True
-    enable_ipset = True
     firewall_driver = neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
     ```
   4. Configure the Open vSwitch (OVS) agent:
