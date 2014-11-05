@@ -325,7 +325,7 @@ Unlike other services, Networking typically does not require a separate step to 
     enable_tunneling = True
     bridge_mappings = external:br-ex
     ```  
-    Replacing _INSTANCE_TUNNELS_INTERFACE_IP_ADDRESSES_ with the IP address of the instance tunnels network interface on your network node. (In this example: 10.0.1.21)
+    Replacing _INSTANCE_TUNNELS_INTERFACE_IP_ADDRESSES_ with the IP address of the instance tunnels network interface on your network node. (In this example: 10.20.20.21)
 4. Configure the Layer-3 (L3) agent. Modify /etc/neutron/l3_agent.ini to:
   1. Configure the driver, enable network namespaces and configure the external network bridge:
   
@@ -544,7 +544,7 @@ Ideally, you can prevent these problems by enabling jumbo frames on the physical
     tunnel_type = gre
     enable_tunneling = True
     ```  
-    Replacing _INSTANCE_TUNNELS_INTERFACE_IP_ADDRESS_ with the IP address of the instance tunnels network interface on your compute node. (In this example 10.0.1.31)
+    Replacing _INSTANCE_TUNNELS_INTERFACE_IP_ADDRESS_ with the IP address of the instance tunnels network interface on your compute node. (In this example 10.20.20.31)
 4. Configure the Open vSwitch (OVS) service. Restart the OVS service:  
   `service openvswitch-switch restart`
 5. Configure Compute to use Networking. By default, distribution packages configure Compute to use legacy networking. You must reconfigure Compute to manage networks through Networking. Modify /etc/nova/nova.conf to:
