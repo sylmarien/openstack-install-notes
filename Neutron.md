@@ -455,7 +455,7 @@ The OVS service provides the underlying virtual networking framework for instanc
 **Installation and configuration of the Networking components**
 
 1. Install the packages:  
-  `apt-get install neutron-plugin-ml2 neutron-plugin-openvswitch-agent`
+  `apt-get install neutron-common neutron-plugin-ml2 neutron-plugin-openvswitch-agent`
 2. Modify /etc/neutron/neutron.conf to:
   1. Comment any _connection_ options in the `[database]` section because the compute nodes do not directly access the database.
   2. Configure RabbitMQ message broker access:
