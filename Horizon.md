@@ -41,7 +41,7 @@ http://docs.openstack.org/icehouse/install-guide/install/apt/content/install_das
     - The address and port must match the ones set in /etc/memcached.conf. If you change the memcached settings, you must restart the Apache web server for the changes to take effect.
     - You can use options other than memcached option for session storage. Set the session back-end through the SESSION_ENGINE option.
   4. (Optionnal) Change the timezone:  
-    `TIME_ZONE = "FR"`  
+    `TIME_ZONE = "UTC"`  
     To find you timezone, follow this [link](http://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
 4. Restart the services:
   
