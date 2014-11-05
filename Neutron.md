@@ -239,7 +239,7 @@ Unlike other services, Networking typically does not require a separate step to 
   apt-get install neutron-plugin-ml2 neutron-plugin-openvswitch-agent neutron-l3-agent neutron-dhcp-agent
   ```
 2. Modify /etc/neutron/neutron.conf to:
-  1. Comment any _connection_ options in the `[DATABASE]` section because network nodes do not directly access the database.
+  1. Comment any _connection_ options in the `[database]` section because network nodes do not directly access the database.
   2. Configure RabbitMQ message broker access:
   
     ```
