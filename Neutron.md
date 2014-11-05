@@ -538,8 +538,11 @@ The OVS service provides the underlying virtual networking framework for instanc
     enable_tunneling = True
     ```  
     Replacing _INSTANCE_TUNNELS_INTERFACE_IP_ADDRESS_ with the IP address of the instance tunnels network interface on your compute node. (In this example 10.20.20.31)
-4. Configure the Open vSwitch (OVS) service. Restart the OVS service:  
-  `service openvswitch-switch restart`
+4. Configure the Open vSwitch (OVS) service.
+  1.Restart the OVS service:  
+    `service openvswitch-switch restart`
+  2. Add the integration bridge:  
+    `ovs-vsctl add-br br-int`
 5. Configure Compute to use Networking. By default, distribution packages configure Compute to use legacy networking. You must reconfigure Compute to manage networks through Networking. Modify /etc/nova/nova.conf to:
   1. Configure the APIs and drivers:
   
@@ -555,14 +558,14 @@ The OVS service provides the underlying virtual networking framework for instanc
   2. Configure access parameters:
   
     ```
-    [neutron]
+    [DEFAULT]
     ...
-    url = http://controller:9696
-    auth_strategy = keystone
-    admin_auth_url = http://controller:35357/v2.0
-    admin_tenant_name = service
-    admin_username = neutron
-    admin_password = NEUTRON_PASS
+    neutron_url = http://controller:9696
+    neutron_auth_strategy = keystone
+    neutron_admin_auth_url = http://controller:35357/v2.0
+    neutron_admin_tenant_name = service
+    neutron_admin_username = neutron
+    neutron_admin_password = NEUTRON_PASS
     ```  
     Replacing _NEUTRON_PASS_ with the password you chose for the _neutron_ user in the Identity service.
 6. Restart the Compute service:  
