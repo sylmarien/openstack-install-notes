@@ -110,7 +110,6 @@ Before installing and configure Neutron, we must create a database and Identity 
     admin_password = NEUTRON_PASS
     ```  
     Replacing _NEUTRON_PASS_ with the password you chose for the _neutron_ user in the Identity service.  
-    **Note:** Comment any auth_host, auth_port, and auth_protocol options because the identity_uri option replaces them.
   4. Enable the Modlular Layer 2 (ML2) plug-in, router service, and overlapping IP addresses:
     
     ```
@@ -260,13 +259,14 @@ Unlike other services, Networking typically does not require a separate step to 
     [keystone_authtoken]
     ...
     auth_uri = http://controller:5000/v2.0
-    identity_uri = http://controller:35357
+    auth_host = controller
+    auth_port = 35357
+    auth_protocol = http
     admin_tenant_name = service
     admin_user = neutron
     admin_password = NEUTRON_PASS
     ```  
     Replacing _NEUTRON_PASS_ with the password you chose for the _neutron_ user in the Identity service.  
-    **Note:** Comment any auth_host, auth_port, and auth_protocol options because the identity_uri option replaces them.
   4. Enable the ML2 plug-in, router service and overlapping addresses:
   
     ```
@@ -485,13 +485,14 @@ Ideally, you can prevent these problems by enabling jumbo frames on the physical
     [keystone_authtoken]
     ...
     auth_uri = http://controller:5000/v2.0
-    identity_uri = http://controller:35357
+    auth_host = controller
+    auth_port = 35357
+    auth_protocol = http
     admin_tenant_name = service
     admin_user = neutron
     admin_password = NEUTRON_PASS
     ```  
     Replacing _NEUTRON_PASS_ with the password you chose for the _neutron_ user in the Identity service.  
-    **Note:** Comment any auth_host, auth_port, and auth_protocol options because the identity_uri option replaces them.
   4. Enable the ML2 plug-in, router service and overlapping addresses:
   
     ```
