@@ -174,7 +174,7 @@ Before installing and configure Neutron, we must create a database and Identity 
     ```
     [ml2]
     ...
-    type_drivers = flat,gre
+    type_drivers = gre
     tenant_network_types = gre
     mechanism_drivers = openvswitch
     ```
@@ -284,30 +284,23 @@ Unlike other services, Networking typically does not require a separate step to 
     verbose = True
     ```
 3. Configure the ML2 plug-in. Modify /etc/neutron/plugins/ml2/ml2_conf.ini to:
-  1. enable the flat and generic routing encapsulation (GRE) network type drivers, GRE tenant networks, and the OVS mechanism driver:
+  1. enable the generic routing encapsulation (GRE) network type drivers, GRE tenant networks, and the OVS mechanism driver:
   
     ```
     [ml2]
     ...
-    type_drivers = flat,gre
+    type_drivers = gre
     tenant_network_types = gre
     mechanism_drivers = openvswitch
     ```
-  2. Configure the external network:
-  
-    ```
-    [ml2_type_flat]
-    ...
-    flat_networks = external
-    ```
-  3. Configure the tunnel identifier (id) range:
+  2. Configure the tunnel identifier (id) range:
   
     ```
     [ml2_type_gre]
     ...
     tunnel_id_ranges = 1:1000
     ```
-  4. Enable security groups and configure the OVS iptables firewall drivers:
+  3. Enable security groups and configure the OVS iptables firewall drivers:
   
     ```
     [securitygroup]
@@ -315,7 +308,7 @@ Unlike other services, Networking typically does not require a separate step to 
     enable_security_group = True
     firewall_driver = neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
     ```
-  5. Configure the Open vSwitch (OVS) agent:
+  4. Configure the Open vSwitch (OVS) agent:
   
     ```
     [ovs]
@@ -323,18 +316,16 @@ Unlike other services, Networking typically does not require a separate step to 
     local_ip = INSTANCE_TUNNELS_INTERFACE_IP_ADDRESS
     tunnel_type = gre
     enable_tunneling = True
-    bridge_mappings = external:br-ex
     ```  
     Replacing _INSTANCE_TUNNELS_INTERFACE_IP_ADDRESSES_ with the IP address of the instance tunnels network interface on your network node. (In this example: 10.20.20.21)
 4. Configure the Layer-3 (L3) agent. Modify /etc/neutron/l3_agent.ini to:
-  1. Configure the driver, enable network namespaces and configure the external network bridge:
+  1. Configure the driver, enable network namespaces:
   
     ```
     [DEFAULT]
     ...
     interface_driver = neutron.agent.linux.interface.OVSInterfaceDriver
     use_namespaces = True
-    external_network_bridge = br-ex
     ```
   2. Set the logging to verbose for troubleshooting purpose (optional):
   
@@ -510,12 +501,12 @@ Ideally, you can prevent these problems by enabling jumbo frames on the physical
     verbose = True
     ```
 3. Configure the ML2 plug-in. Modify /etc/neutron/plugins/ml2/ml2_conf.ini to:
-  1. Enable the flat and generic routing encapsulation (GRE) network type drivers, GRE tenant networks, and the OVS mechanism driver:
+  1. Enable the generic routing encapsulation (GRE) network type drivers, GRE tenant networks, and the OVS mechanism driver:
   
     ```
     [ml2]
     ...
-    type_drivers = flat,gre
+    type_drivers = gre
     tenant_network_types = gre
     mechanism_drivers = openvswitch
     ```
