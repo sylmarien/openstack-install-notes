@@ -406,10 +406,10 @@ Ideally, you can prevent these problems by enabling jumbo frames on the physical
   2. **On the controller node**, modify /etc/nova/nova.conf to enable the metadata proxy and configure the secret:
   
     ```
-    [neutron]
+    [DEFAULT]
     ...
-    service_metadata_proxy = True
-    metadata_proxy_shared_secret = METADATA_SECRET
+    service_neutron_metadata_proxy = True
+    neutron_metadata_proxy_shared_secret = METADATA_SECRET
     ```  
     Replacing _METADATA_SECRET_ with the secret you chose for the metadata proxy.
   3. **On the controller node**, restart the Compute API service:  
