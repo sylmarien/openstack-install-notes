@@ -583,10 +583,7 @@ The external network typically provides Internet access for your instances. By d
     1. Source the _admin_ credentials to gain access to admin-only CLI commands:  
       `source admin-openrc.sh`
     2. Create the network:
-      
-      ```
-      neutron net-create ext-net --shared --router:external True --provider:physical_network external --provider:network_type flat
-      ```
+      `neutron net-create ext-net --shared --router:external True`
   2. Create a subnet on the external network:
     
     ```
