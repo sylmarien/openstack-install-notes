@@ -51,53 +51,104 @@ d-i	time/zone string Europe/Luxembourg
 d-i clock-setup/ntp boolean true
 
 
-## Partitioning (Change to use hardware RAID)
-# Use the first SCSI/SATA Hard Drive
-d-i partman-auto/disk string /dev/sda
-# Use the usual types of partitions for the given architecture
-d-i partman-auto/method string regular
-# Do not prompt if old LVM configuration existed
-d-i partman-lvm/device_remove_lvm boolean true
-# Same for old softare RAID array
-d-i partman-md/device_remove_md boolean true
-# Do not ask for confirmation to write the lvm partitions
-d-i partman-lvm/confirm boolean true
-# Use custom recipe to partition the disk (values for the swap? How much swap when we have 32GB or even 320GB of RAM?)
-d-i partman-auto/expert_recipe string          			\
-	openstack-lvm-partition ::                     		\
-	    512 512 512 ext4                           		\
-	        $primary{ } $bootable{ }               		\
-	        method{ format } format{ }             		\
-	        use_filesystem{ } filesystem{ ext4 }   		\
-	        mountpoint{ /boot }                    		\
-	    .                                          		\
-	    64 512 300% linux-swap                     		\
-	        method{ swap } forsmt{ }               		\
-	    .                                          		\
-	    50000 100000 1000000000 ext4               		\
-	        $defaultignore{ }                      		\
-	        $primary{ }                            		\
-	        method{ lvm }                          		\
-	        vg_name{ vg0 }                         		\
-	    .                                          		\
-	    10000 50000 50000 ext4                     		\
-	        $lvmok{ }                              		\
-	        in_vg{ vg0 }                           		\
-	        lv_name{ root }                        		\
-	        method{ format } format{ }             		\
-	        use_filesystem{ } filesystem{ ext4 }   		\
-			mountpoint{ /root }                    		\
+### Partitioning (Change to use hardware RAID)
+## Use the first SCSI/SATA Hard Drive
+#d-i partman-auto/disk string /dev/sda
+## Use the usual types of partitions for the given architecture
+#d-i partman-auto/method string regular
+## Do not prompt if old LVM configuration existed
+#d-i partman-lvm/device_remove_lvm boolean true
+## Same for old softare RAID array
+#d-i partman-md/device_remove_md boolean true
+## Do not ask for confirmation to write the lvm partitions
+#d-i partman-lvm/confirm boolean true
+## Use custom recipe to partition the disk (values for the swap? How much swap when we have 32GB or even 320GB of RAM?)
+#d-i partman-auto/expert_recipe string          			\
+#	openstack-lvm-partition ::                     		\
+#	    512 512 512 ext4                           		\
+#	        $primary{ } $bootable{ }               		\
+#	        method{ format } format{ }             		\
+#	        use_filesystem{ } filesystem{ ext4 }   		\
+#	        mountpoint{ /boot }                    		\
+#	    .                                          		\
+#	    64 512 300% linux-swap                     		\
+#	        method{ swap } forsmt{ }               		\
+#	    .                                          		\
+#	    50000 100000 1000000000 ext4               		\
+#	        $defaultignore{ }                      		\
+#	        $primary{ }                            		\
+#	        method{ lvm }                          		\
+#	        vg_name{ vg0 }                         		\
+#	    .                                          		\
+#	    10000 50000 50000 ext4                     		\
+#	        $lvmok{ }                              		\
+#	        in_vg{ vg0 }                           		\
+#	        lv_name{ root }                        		\
+#	        method{ format } format{ }             		\
+#	        use_filesystem{ } filesystem{ ext4 }   		\
+#			mountpoint{ /root }                    		\
+#		.
+## Proceed with the partitioning without asking for confirmation
+#d-i partman-partitioning/confirm_write_new_label boolean true
+#d-i partman/choose_partition select finish
+#d-i partman/confirm boolean true
+#d-i partman/confirm_nooverwrite boolean true
+#
+#
+### Base system installation
+## Kernel image package to be installed
+#d-i base-installer/kernel/image string linux-generic
+
+
+## Partitioning using RAID
+# Set the partitioning method to RAID
+d-i partman-auto/method string raid
+# Select the disks to use
+d-i partman-auto/disk string /dev/sda /dev/sdb
+# Define how the partitions wil be used in the RAID setup (RAID0 between the two disks. A /boot partition and another partition for LVM)
+d-i partman-auto-raid/recipe string			\
+	1 2 0 ext3 /boot						\
+		/dev/sda1#/dev/sdb1					\
+	.										\
+	1 2 0 lvm -								\
+		/dev/sda5#/dev/sdb5					\
+	.
+
+# Change values and mountpoints)
+d-i partman-auto/expert_recipe string		\
+	openstack-lvm-partition-raid1 ::		\
+		100 512 256 raid					\
+			$lvmignore{ }					\
+			$primary{ }						\
+			method{ raid }					\
+		.									\
+		900 5000 4000 raid					\
+			$lvmignore{ }					\
+			method{ raid }					\
+		.									\
+		700 5000 4000 ext3					\
+			$defaultignore{ }				\
+			$lvmok{ }						\
+			method{ format }				\
+			format{ }						\
+			use_filesystem{ }				\
+			filesystem{ ext3 }				\
+			mountpoint{ / }					\
+		.									\
+		64 512 300% linux-swap				\
+			$defaultignore{ }				\
+			$lvmok{ }						\
+			method{ swap }					\
+			format{ }						\
+		.									\
+		100 1000 1000000000 ext3			\
+			$defaultignore{ }				\
+			$lvmok{ }						\
+			method{ format }				\
+			format{ }						\
+			use_filesystem{ }				\
+			filesystem{ ext3 }				\
+			mountpoint{ /home }				\
 		.
-# Proceed with the partitioning without asking for confirmation
-d-i partman-partitioning/confirm_write_new_label boolean true
-d-i partman/choose_partition select finish
-d-i partman/confirm boolean true
-d-i partman/confirm_nooverwrite boolean true
-
-
-## Base system installation
-# Kernel image package to be installed
-d-i base-installer/kernel/image string linux-generic
-
 
 ## Account setup
