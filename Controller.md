@@ -64,6 +64,16 @@ iface br0 inet static
   ```
 3. Reboot to activate changes.
 
+## NTP configuration
+
+1. Install the ntp package: `apt-get install ntp`
+2. Remove the nopeer and noquery option from the `restrict` lines, these line will then become:
+
+  ```
+  restrict -4 default kod notrap nomodify
+  restrict -6 default kod notrap nomodify
+  ```
+
 ## Virtual Machines configuration
 
 1. Requisite packages:  
@@ -114,6 +124,9 @@ virsh autostart database
   `virsh console horizon`
   2. Modify `/etc/hosts` with the following changes:  
     ```
+  # Controller node
+  10.79.6.7       openstack-ctrl1
+
   # Horizon
   10.79.7.1       horizon
 
@@ -128,4 +141,12 @@ virsh autostart database
     ```
   3. Apply updates and install the ntp package:  
   `apt-get update && apt-get dist-upgrade && apt-get install ntp`
+  4. Configure ntp to synchronize with the controller node clock.
+    1. Modify `/etc/ntp.conf`, comment all server keys and add the following one:  
+      ```
+      # OpenStack architecture reference
+      server openstack-ctrl1 iburst dynamic
+      ```
+    2. Remove the `/var/lib/ntp/ntp.conf.dhcp` file if it exists.
+    3. Restart the NTP service: `service ntp restart`
 8. The common configuration is now finished, follow the VM-specific configurations in the corresponding files.
