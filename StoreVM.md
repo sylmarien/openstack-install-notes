@@ -1,7 +1,7 @@
-# Horizon VM
+# Store VM
 
 ## Overview
-This file contains notes on the Horizon VM of the architecture. Among others, the purpose of this document is to take track of the OpenStack components, and each modules of these components specifically, that are installed on the Horizon VM.
+This file contains notes on the Store VM of the architecture. Among others, the purpose of this document is to take track of the OpenStack components, and each modules of these components specifically, that are installed on the Store VM.
 
 **During development, all passwords are _localadmin_.**
 

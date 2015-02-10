@@ -20,7 +20,23 @@ During the development period it also contains reminders on topics to dig furthe
 
 #### [Controller.md](https://github.com/sylmarien/openstack-install-notes/blob/master/Controller.md)
 
-This file contains notes on the Controller node of the architecture. Among others, the purpose of this document is to take track of the OpenStack components, and each modules of these components specifically, that are installed on the Controller node.
+This file contains notes on the Controller node of the architecture.
+
+##### [HorizonVM.md](https://github.com/sylmarien/openstack-install-notes/blob/master/HorizonVM.md)
+
+This file contains notes on the Horizon VM of the architecture. Among others, the purpose of this document is to take track of the OpenStack components, and each modules of these components specifically, that are installed on the Horizon VM.
+
+##### [CoreVM.md](https://github.com/sylmarien/openstack-install-notes/blob/master/CoreVM.md)
+
+This file contains notes on the Horizon VM of the architecture. Among others, the purpose of this document is to take track of the OpenStack components, and each modules of these components specifically, that are installed on the Core VM.
+
+##### [StoreVM.md](https://github.com/sylmarien/openstack-install-notes/blob/master/StoreVM.md)
+
+This file contains notes on the Horizon VM of the architecture. Among others, the purpose of this document is to take track of the OpenStack components, and each modules of these components specifically, that are installed on the Store VM.
+
+##### [DatabaseVM.md](https://github.com/sylmarien/openstack-install-notes/blob/master/DatabaseVM.md)
+
+This file contains notes on the Horizon VM of the architecture. Among others, the purpose of this document is to take track of the OpenStack components, and each modules of these components specifically, that are installed on the Database VM.
 
 #### [Compute.md](https://github.com/sylmarien/openstack-install-notes/blob/master/Compute.md)
 
@@ -29,6 +45,7 @@ This file contains notes on the Compute node of the architecture. Among others, 
 #### [Network.md](https://github.com/sylmarien/openstack-install-notes/blob/master/Network.md)
 
 This file contains notes on the Network node of the architecture. Among others, the purpose of this document is to take track of the OpenStack components, and each modules of these components specifically, that are installed on the Network node.
+
 
 #### Storage.md (Exists ? To be decided)
 
