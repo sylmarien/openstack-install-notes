@@ -69,16 +69,14 @@ iface br0 inet static
 1. Requisite packages:  
 `apt-get install qemu-kvm libvirt-bin virtinst`
 2. Download most recent ubuntu server image (14.04.1 at this time). For the next commands I'll name it ubuntu-14.04.1-server-amd64.iso
-3. Create logical volumes as stated in the basic environment section:
-
+3. Create logical volumes as stated in the basic environment section:  
 ```
 lvcreate -n horizon -L 10G vg0
 lvcreate -n core -L 10G vg0
 lvcreate -n store -L 50G vg0
 lvcreate -n database -L 50G vg0
 ```
-4. Create the VMs using the ubuntu server image and the virt-install command:
-
+4. Create the VMs using the ubuntu server image and the virt-install command:  
 ```
 virt-install --name=horizon --description="VM hosting the OpenStack Horizon service." --ram=4096 --vcpus=3 --os-variant=ubuntutrusty --location /home/localadmin/ubuntu-14.04.1-server-amd64.iso --extra-args='console=tty0 console=ttyS0,115200n8 serial' --disk path=/dev/vg0/horizon --hvm --network bridge=br0 --autostart --nographics
 virt-install --name=core --description="VM hosting the OpenStack core services: Nova, Neutron, Keystone, RabbitMQ." --ram=4096 --vcpus=3 --os-variant=ubuntutrusty --location /home/localadmin/ubuntu-14.04.1-server-amd64.iso --extra-args='console=tty0 console=ttyS0,115200n8 serial' --disk path=/dev/vg0/core --hvm --network bridge=br0 --autostart --nographics
@@ -86,8 +84,7 @@ virt-install --name=store --description="VM hosting the OpenStack storage servic
 virt-install --name=database --description="VM hosting the OpenStack database." --ram=4096 --vcpus=3 --os-variant=ubuntutrusty --location /home/localadmin/ubuntu-14.04.1-server-amd64.iso --extra-args='console=tty0 console=ttyS0,115200n8 serial' --disk path=/dev/vg0/database --hvm --network bridge=br0 --autostart --nographics
 ```
 5. For each of them follow the installation steps and configure them accordingly to the wanted configuration.  
-In our case, here are the majors informations (temporary):
-
+In our case, here are the majors informations (temporary):  
 ```
 DNS:
 10.28.0.4
@@ -101,8 +98,7 @@ Core: 10.79.7.2 (hostname: core, no domain name). user: localadmin mdp: localadm
 Store: 10.79.7.3 (hostname: store, no domain name). user: localadmin mdp: localadmin
 Database: 10.79.7.4 (hostname: database, no domain name). user: localadmin mdp: localadmin
 ```
-6. Once the VM are running, before connecting to them, make sure to make them launch automatically when the server boots:
-
+6. Once the VM are running, before connecting to them, make sure to make them launch automatically when the server boots:  
 ```
 virsh autostart horizon
 virsh autostart core
@@ -110,10 +106,9 @@ virsh autostart store
 virsh autostart database
 ```
 7. Once that is done, connect to the various VMs to perform the following manipulation (example is shown for horizon, just apply the same command on all the VMs):
-  1. Connect to the VM:
+  1. Connect to the VM:  
   `virsh console horizon`
-  2. Modify `/etc/hosts` with the following changes:
-
+  2. Modify `/etc/hosts` with the following changes:  
   ```
   # Horizon
   10.79.7.1       horizon
