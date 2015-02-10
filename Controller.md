@@ -1,98 +1,132 @@
 # Controller node
 
 ## Overview
-This file contains notes on the Controller node of the architecture. Among others, the purpose of this document is to take track of the OpenStack components, and each modules of these components specifically, that are installed on the Controller node.
+This file contains notes on the Controller node of the architecture.
 
-**During development, all passwords are _kikoo_.**
+**During development, all passwords are _localadmin_.**
 
 ## Basic environment
 
-The network configuration for this node is the following:  
-2 interfaces:
+The system has been set up on an a disk managed through LVM with the following configuration:  
+- 1 VG containing all the storage available (all the PVs) named vg0
+- a _root_ LV of 100Go that contains the OS
+- a _horizon_ LV of 10Go that will contain the Horizon service of OpenStack.
+- a _core_ LV of 10Go that will contain the Nova, Neutron, Keystone services of Openstack as well as the RabbitMQ service.
+- a _store_ LV of 50Go that will contain the Glance, Cinder and Swift services of OpenStack.
+- a _Database_ LV of 50Go that will contain the SQL database (MariaDB).
 
-- eth0 : NAT
-- eth1 : management network (on subnet 10.10.10.0/24)
+The network configuration for this node is the following:  
+
+- em1 : physical interface connect to the network
+- br0: virtual interface (bridge) used to connect all the VMs to em1
 
 **Configure networking**
 
 1. Modify /etc/network/interfaces to configure eth1:
 
   ```
-  # Management network interface
-  auto eth1
-  iface eth1 inet static
-  address 10.10.10.11
-  netmask 255.255.255.0
-  # On VM, no gateway because it is set by the DHCP on the NAT interface
-  # gateway 10.10.10.1
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+# Set up interfaces manually, avoiding conflicts with, e.g., network manager
+auto em1
+iface em1 inet manual
+
+# Bridge setup
+auto br0
+iface br0 inet static
+  bridge_ports em1
+  address 10.79.6.7
+  netmask 255.255.0.0
+  broadcast 10.79.255.255
+  gateway 10.79.0.1
+  dns-nameservers 10.28.0.4 10.28.0.5
+  dns-search uni.lux
   ```
 2. Modify /etc/hosts to configure the name resolution:
 
   ```
-  # controller
-  10.10.10.11       controller
+127.0.0.1       localhost
+127.0.1.1       openstack-ctrl1
 
-  # network
-  10.10.10.21       network
+# Horizon
+10.79.7.1       horizon
 
-  # compute1
-  10.10.10.31       compute1
-  ```  
-  Comment any other line.
+# Core
+10.79.7.2       core
+
+# Store
+10.79.7.3       store
+
+# Database
+10.79.7.4       database
+  ```
 3. Reboot to activate changes.
 
-**Configure NTP**
+## Virtual Machines configuration
 
-Install the NTP service:  
-  `apt-get install ntp`
+1. Requisite packages:  
+`apt-get install qemu-kvm libvirt-bin virtinst`
+2. Download most recent ubuntu server image (14.04.1 at this time). For the next commands I'll name it ubuntu-14.04.1-server-amd64.iso
+3. Create logical volumes as stated in the basic environment section:
 
-**Basic prerequisites**
+```
+lvcreate -n horizon -L 10G vg0
+lvcreate -n core -L 10G vg0
+lvcreate -n store -L 50G vg0
+lvcreate -n database -L 50G vg0
+```
+4. Create the VMs using the ubuntu server image and the virt-install command:
 
-1. Install _python-software-properties_ package to ease repository management:  
-  `apt-get install python-software-properties`
-2. Enable the OpenStack repository (seems not necessary on Ubuntu 14.04 since Icehouse is the default version):  
-  `add-apt-repository cloud-archive:icehouse`
-3. Upgrade the packages on the system:  
-  `apt-get update && apt-get dist-upgrade`
+```
+virt-install --name=horizon --description="VM hosting the OpenStack Horizon service." --ram=4096 --vcpus=3 --os-variant=ubuntutrusty --location /home/localadmin/ubuntu-14.04.1-server-amd64.iso --extra-args='console=tty0 console=ttyS0,115200n8 serial' --disk path=/dev/vg0/horizon --hvm --network bridge=br0 --autostart --nographics
+virt-install --name=core --description="VM hosting the OpenStack core services: Nova, Neutron, Keystone, RabbitMQ." --ram=4096 --vcpus=3 --os-variant=ubuntutrusty --location /home/localadmin/ubuntu-14.04.1-server-amd64.iso --extra-args='console=tty0 console=ttyS0,115200n8 serial' --disk path=/dev/vg0/core --hvm --network bridge=br0 --autostart --nographics
+virt-install --name=store --description="VM hosting the OpenStack storage services: Glance, Cinder, Swift." --ram=4096 --vcpus=3 --os-variant=ubuntutrusty --location /home/localadmin/ubuntu-14.04.1-server-amd64.iso --extra-args='console=tty0 console=ttyS0,115200n8 serial' --disk path=/dev/vg0/store --hvm --network bridge=br0 --autostart --nographics
+virt-install --name=database --description="VM hosting the OpenStack database." --ram=4096 --vcpus=3 --os-variant=ubuntutrusty --location /home/localadmin/ubuntu-14.04.1-server-amd64.iso --extra-args='console=tty0 console=ttyS0,115200n8 serial' --disk path=/dev/vg0/database --hvm --network bridge=br0 --autostart --nographics
+```
+5. For each of them follow the installation steps and configure them accordingly to the wanted configuration.  
+In our case, here are the majors informations (temporary):
 
-**Database**  
-We use MariaDB to manage the SQL database.
+```
+DNS:
+10.28.0.4
+10.28.0.5
 
-1. Install the packages:  
-  `apt-get install mariadb-server python-mysqldb`
-2. Choose a suitable password for the database root account.
-3. Modify /etc/mysql/my.cnf to:
-  1. Set the bind-address key to the management IP address of the controller node to enable access by other nodes va the management network:
-  
-    ```
-    [mysqld]
-    ...
-    bind-address = 10.10.10.11
-    ```
-  2. Set the following keys to enable useful options and the UTF-8 character set:
-  
-    ```
-    [mysqld]
-    ...
-    default-storage-engine = innodb
-    innodb_file_per_table
-    collation-server = utf8_general_ci
-    init-connect = 'SET NAMES utf8'
-    character-set-server = utf8
-    ```
-4. Restart the database service:  
-  `service mysql restart`
-5. Secure the database service:  
-  `mysql_secure_installation`
+Gateway: 10.79.0.1
 
-**Messaging server**  
-We use RabbitMQ as message broker service.
+openstack-ctrl1:
+Horizon : 10.79.7.1 (hostname: horizon, no domain name). user: localadmin mdp: localadmin
+Core: 10.79.7.2 (hostname: core, no domain name). user: localadmin mdp: localadmin
+Store: 10.79.7.3 (hostname: store, no domain name). user: localadmin mdp: localadmin
+Database: 10.79.7.4 (hostname: database, no domain name). user: localadmin mdp: localadmin
+```
+6. Once the VM are running, before connecting to them, make sure to make them launch automatically when the server boots:
 
-1. Install the package:  
-  `apt-get install rabbitmq-server`
-2. Configure the message broker service (replace the guest password):  
-  `rabbitmqctl change_password guest RABBIT_PASS`  
-  Replacing _RABBIT_PASS_ with a suitable password.
+```
+virsh autostart horizon
+virsh autostart core
+virsh autostart store
+virsh autostart database
+```
+7. Once that is done, connect to the various VMs to perform the following manipulation (example is shown for horizon, just apply the same command on all the VMs):
+  1. Connect to the VM:
+  `virsh console horizon`
+  2. Modify `/etc/hosts` with the following changes:
 
-**Note:** During development, we use the guest account that is automatically created by RabbitMQ, but for production, we should create a unique user with suitable password.  
-Then, we would have to configure the _rabbit_userid_ and _rabbit_password_ keys accordingly in the configuration files of each OpenStack service that use the message broker.
+  ```
+  # Horizon
+  10.79.7.1       horizon
+
+  # Core
+  10.79.7.2       core
+
+  # Store
+  10.79.7.3       store
+
+  # Database
+  10.79.7.4       database
+  ```
+  3. Apply updates and install the ntp package:  
+  `apt-get update && apt-get dist-upgrade && apt-get install ntp`
+8. The common configuration is now finished, follow the VM-specific configurations in the corresponding files.
