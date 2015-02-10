@@ -1,0 +1,62 @@
+No RAID:
+openstack-lvm-partition ::                      \
+    512 512 512 ext4                            \
+        $primary{ } $bootable{ }                \
+        method{ format } format{ }              \
+        use_filesystem{ } filesystem{ ext4 }    \
+        mountpoint{ /boot }                     \
+    .                                           \
+    64 512 300% linux-swap                      \
+        method{ swap } forsmt{ }                \
+    .                                           \
+    50000 100000 1000000000 ext4                \
+        $defaultignore{ }                       \
+        $primary{ }                             \
+        method{ lvm }                           \
+        vg_name{ vg0 }                          \
+    .                                           \
+    10000 50000 50000 ext4                      \
+        $lvmok{ }                               \
+        in_vg{ vg0 }                            \
+        lv_name{ root }                         \
+        method{ format } format{ }              \
+        use_filesystem{ } filesystem{ ext4 }    \
+        mountpoint{ /root }                     \
+    .
+
+
+RAID:
+multiraid ::                        \
+      100 512 256 raid              \
+          $lvmignore{ }             \
+          $primary{ }               \
+          method{ raid }            \
+      .                             \
+      900 5000 4000 raid            \
+          $lvmignore{ }             \
+          method{ raid }            \
+      .                             \
+      700 5000 4000 ext3            \
+          $defaultignore{ }         \
+          $lvmok{ }                 \
+          method{ format }          \
+          format{ }                 \
+          use_filesystem{ }         \
+          filesystem{ ext3 }        \
+          mountpoint{ / }           \
+      .                             \
+      64 512 300% linux-swap        \
+          $defaultignore{ }         \
+          $lvmok{ }                 \
+          method{ swap }            \
+          format{ }                 \
+      .                             \
+      100 1000 1000000000 ext3      \
+          $defaultignore{ }         \
+          $lvmok{ }                 \
+          method{ format }          \
+          format{ }                 \
+          use_filesystem{ }         \
+          filesystem{ ext3 }        \
+          mountpoint{ /home }       \
+      .
