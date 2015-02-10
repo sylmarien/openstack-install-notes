@@ -3,6 +3,11 @@
 ## Overview
 This file contains notes on the Core VM of the architecture. Among others, the purpose of this document is to take track of the OpenStack components, and each modules of these components specifically, that are installed on the Core VM.
 
+Go to:
+- [Keystone Configuration](#keystone-configuration)
+- [Nova Configuration](#nova-configuration)
+- [Neutron Configuration](#neutron-configuration)
+
 **During development, all passwords are _localadmin_.**
 
 ## Basic configuration
@@ -15,6 +20,12 @@ Basic configuration is described in the [Controller.md](https://github.com/sylma
   `apt-get install python-software-properties`
 2. Enable the OpenStack repository (not necessary on Ubuntu 14.04 since Icehouse is the default version):  
   `add-apt-repository cloud-archive:icehouse`
+
+## Keystone Configuration
+
+## Nova Configuration
+
+## Neutron Configuration
 
 **Messaging server**  
 We use RabbitMQ as message broker service.

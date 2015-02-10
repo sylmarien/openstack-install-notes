@@ -15,13 +15,13 @@ We use MariaDB to manage the SQL database.
 1. Install the packages:  
   `apt-get install mariadb-server python-mysqldb`
 2. Choose a suitable password for the database root account.
-3. Modify /etc/mysql/my.cnf to:
+3. Modify `/etc/mysql/my.cnf` to:
   1. Set the bind-address key to the management IP address of the controller node to enable access by other nodes va the management network:
   
     ```
     [mysqld]
     ...
-    bind-address = 10.10.10.11
+    bind-address = 10.79.7.4
     ```
   2. Set the following keys to enable useful options and the UTF-8 character set:
   
@@ -37,4 +37,7 @@ We use MariaDB to manage the SQL database.
 4. Restart the database service:  
   `service mysql restart`
 5. Secure the database service:  
-  `mysql_secure_installation`
+  `mysql_secure_installation`  
+  Make sure to deactivate the remote root access.
+
+The various databases will be created when needed during the various steps of the OpenStack configuration. (You will have to create it with the root user, so directly from the VM)

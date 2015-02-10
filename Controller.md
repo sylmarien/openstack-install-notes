@@ -139,8 +139,8 @@ virsh autostart database
   # Database
   10.79.7.4       database
     ```
-  3. Apply updates and install the ntp package:  
-  `apt-get update && apt-get dist-upgrade && apt-get install ntp`
+  3. Apply updates and install the ntp package as well as the mariadb-client package:  
+  `apt-get update && apt-get dist-upgrade && apt-get install ntp mariadb-client`
   4. Configure ntp to synchronize with the controller node clock.
     1. Modify `/etc/ntp.conf`, comment all server keys and add the following one:  
       ```
