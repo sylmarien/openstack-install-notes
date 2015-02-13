@@ -2,67 +2,67 @@
 
 ## Overview
 
-This file contains notes on the Controller node of the architecture. Among others, the purpose of this document is to take track of the OpenStack components, and each modules of these components specifically, that are installed on the Controller node.
+This file contains notes on the Compute nodes of the architecture. Among others, the purpose of this document is to take track of the OpenStack components, and each modules of these components specifically, that are installed on the Controller node.
 
-**During development, all passwords are _kikoo_.**
+**During development, all passwords are _localadmin_.**
 
 ## Basic environment
 
-The network configuration for this node is the following:  
-3 interfaces :
+The network configuration for these nodes is the following:  
 
-- eth0 : NAT
-- eth1 : Management interface (subnet 10.10.10.0/24)
-- eth2 : Instance tunnels interface (subnet 10.20.20.0/24)
+- em1: 10.79.6.9->12
 
 **Configure networking**
 
-1. Modify /etc//network/interfaces to configure:
-  1. eth1 :
+1. Content of /etc//network/interfaces should look like:
   
     ```
-    # Management network interface
-    auto eth1
-    iface eth1 inet static
-    address 10.10.10.31
-    netmask 255.255.255.0
-    # On VM, no gateway because it is set by the DHCP on the NAT interface
-    # gateway 10.10.10.1
-    ```
-  2. eth2 :
-  
-    ```
-    # Instance tunnels interface
-    auto eth2
-    iface eth2 inet static
-    address 10.20.20.31
-    netmask 255.255.255.0
+    auto em1
+    iface em1 inet static
+        address 10.79.6.12
+        netmask 255.255.0.0
+        broadcast 10.79.255.255
+        gateway 10.79.0.1
+        dns-nameservers 10.28.0.4 10.28.0.5
+        dns-search uni.lux
     ```
 2. Modify /etc/hosts to configure the name resolution:
 
   ```
-  # controller
-  10.10.10.11       controller
+  # Horizon
+  10.79.7.1       horizon
 
-  # network
-  10.10.10.21       network
+  # Core
+  10.79.7.2       core
 
-  # compute1
-  10.10.10.31       compute1
-  ```  
-  Comment any other line.
+  # Store
+  10.79.7.3       store
+
+  # Database
+  10.79.7.4       database
+
+  ```
 3. Reboot to activate changes.
 
 **Configure NTP**
 
 1. Install the NTP service:  
-  `apt-get install ntp`
+  `apt-get update && apt-get dist-upgrade && apt-get install ntp`
 2. Configure the NTP service:
-  1. Modify /etc/ntp.conf to comment or remove all server key but one to reference the controller node:  
-    `server controller iburst`
+  1. Modify /etc/ntp.conf to comment or remove all server key but one to reference the controller node:
+
+      ```
+      # OpenStack architecture reference
+      server openstack-ctrl1 iburst dynamic
+      ```
   2. Remove the /var/lib/ntp/ntp.conf.dhcp file if it exists.
 3. Restart the NTP service:  
   `service ntp restart`
+
+**Database**
+
+Install the packages:  
+  `apt-get install mariadb-client python-mysqldb`
 
 **Basic prerequisites**
 
@@ -73,8 +73,6 @@ The network configuration for this node is the following:
 3. Upgrade the packages on the system:  
   `apt-get update && apt-get dist-upgrade`
 
-**Database**
+## Nova configuration
 
-*Peut-être inutile !*
-Install the packages:  
-  `apt-get install mariadb-client python-mysqldb`
+Follow instructions at [Nova.md](https://github.com/sylmarien/openstack-install-notes/blob/master/Nova.md#compute-node-installation)

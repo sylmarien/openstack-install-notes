@@ -11,11 +11,11 @@ As of now, I follow the instructions of the documentation at this page:
 [Nova Install in the OpenStack documentation](http://docs.openstack.org/juno/install-guide/install/apt/content/ch_nova.html)
 
 Go to:  
-[Controller node install](https://github.com/sylmarien/openstack-install-notes/blob/master/Nova.md#controller-node-install)  
-[Compute node install](https://github.com/sylmarien/openstack-install-notes/blob/master/Nova.md#compute-node-install)
+[Core VM installation](https://github.com/sylmarien/openstack-install-notes/blob/master/Nova.md#core-vm-installation)  
+[Compute node installation](https://github.com/sylmarien/openstack-install-notes/blob/master/Nova.md#compute-node-installation)
 
 #### List of installed modules by node
-**Controller node:**
+**Controller side:**
 
 - nova-api
 - nova-cert
@@ -24,30 +24,31 @@ Go to:
 - nova-novncproxy
 - nova-scheduler
 - python-novaclient
+- python-mysqldb
 
 **Compute node:**
 
-- nova-compute
-- sysfsutils
+- nova-compute (nova-compute-kvm ??)
+- sysfsutils (????)
 
-#### Controller node install
+#### Core VM installation
 **Prerequisites:** Before installing and configure Compute, we must create a database and Identity service credentials including endpoints.
 
 1. Create the database:
-    1. Access the database server as the _root_ user:  
+    1. Access the database server as the _root_ user **on the databse VM**:  
         `mysql -u root -p`
-    2. Create the _nova_ database:  
+    2. Create the _nova_ database **on the databse VM**:  
         `CREATE DATABASE nova;`
-    3. Grant proper access to the _nova_ database:
+    3. Grant proper access to the _nova_ database **on the databse VM**:
     
         ```
         GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'localhost' IDENTIFIED BY 'NOVA_DBPASS';
         GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'%' IDENTIFIED BY 'NOVA_DBPASS';
         ```
     Replacing _NOVA_DBPASS_ with a suitable password.
-2. Source the _admin_ credentials to gain access to admin-only CLI commands:  
+2. Source the _admin_ credentials to gain access to admin-only CLI commands **on the core VM**:  
     `source admin-openrc.sh`
-3. Create the Identity service credentials:
+3. Create the Identity service credentials **on the core VM**:
     1. Create the _nova_ user:  
         `keystone user-create --name nova --pass NOVA_PASS`  
     Replacing _NOVA_PASS_ with a suitable password.
@@ -55,10 +56,10 @@ Go to:
         `keystone user-role-add --user nova --tenant service --role admin`
     3. Create the _nova_ service:  
         `keystone service-create --name nova --type compute --description "OpenStack Compute"`
-4. Create the Compute service endpoints:
+4. Create the Compute service endpoints **on the core VM**:
 
     ```
-    keystone endpoint-create --service-id $(keystone service-list | awk '/ compute / {print $2}') --publicurl http://controller:8774/v2/%\(tenant_id\)s --internalurl http://controller:8774/v2/%\(tenant_id\)s --adminurl http://controller:8774/v2/%\(tenant_id\)s --region regionOne
+    keystone endpoint-create --service-id $(keystone service-list | awk '/ compute / {print $2}') --publicurl http://core:8774/v2/%\(tenant_id\)s --internalurl http://core:8774/v2/%\(tenant_id\)s --adminurl http://core:8774/v2/%\(tenant_id\)s --region regionOne
     ```
 
 **Installation and configuration of the Compute Controller component**
@@ -66,7 +67,7 @@ Go to:
 1. Install the packages:
 
     ```
-    apt-get install nova-api nova-cert nova-conductor nova-consoleauth nova-novncproxy nova-scheduler python-novaclient
+    apt-get install nova-api nova-cert nova-conductor nova-consoleauth nova-novncproxy nova-scheduler python-novaclient python-mysqldb
     ```
 2. Modify /etc/nova/nova.conf to:
     1. Configure database access:
@@ -74,16 +75,17 @@ Go to:
         ```
         [database]
         ...
-        connection = mysql://nova:NOVA_DBPASS@controller/nova
+        connection = mysql://nova:NOVA_DBPASS@database/nova
         ```
-    Replacing _NOVA_DBPASS_ with the password you chose for the Compute database.
+    Replacing _NOVA_DBPASS_ with the password you chose for the nova database.
     2. Configure RabbitMQ message broker access:
     
         ```
         [DEFAULT]  
         ...
         rpc_backend = rabbit
-        rabbit_host = controller
+        rabbit_host = core
+        rabbit_userid = guest
         rabbit_password = RABBIT_PASS
         ```
     Replacing _RABBIT_PASS_ with the password you chose for the guest account in RabbitMQ.
@@ -97,8 +99,8 @@ Go to:
         ```
         [keystone_authtoken]
         ...
-        auth_uri = http://controller:5000
-        auth_host = controller
+        auth_uri = http://core:5000
+        auth_host = core
         auth_port = 35357
         auth_protocol = http
         admin_tenant_name = service
@@ -106,31 +108,24 @@ Go to:
         admin_password = NOVA_PASS
         ```
     Replacing _NOVA_PASS_ with the password you chose for the _nova_ user in the Identity service.
-    4. Configure the IP to be the management interface IP address of the Controller node:
+    4. Configure the IP to be the management interface IP address of the core VM and configure the VNC proxy to use this same IP:
     
         ```
         [DEFAULT]
         ...
         my_ip = MANAGEMENT_IP_ADDRESS
-        ```  
-        Replacing _MANAGEMENT_IP_ADDRESS_ with the IP address of the management interface. (10.10.10.11 in our example).
-    5. Configure the VNC proxy to use the managament interface IP address of the Controller node:
-    
-        ```
-        [DEFAULT]
-        ...
         vncserver_listen = MANAGEMENT_IP_ADDRESS
         vncserver_proxyclient_address = MANAGEMENT_IP_ADDRESS
         ```  
-        Replacing _MANAGEMENT_IP_ADDRESS_ with the IP address of the management interface. (10.10.10.11 in our example).
-    6. Configure the location of the Image service:
+        Replacing _MANAGEMENT_IP_ADDRESS_ with the IP address of the management interface. (10.79.7.2 in this temporary configuration).
+    5. Configure the location of the Image service:
     
         ```
         [DEFAULT]
         ...
-        glance_host = controller
+        glance_host = store
         ```
-    7. Set the logging to verbose for troubleshooting purpose (optional):
+    6. Set the logging to verbose for troubleshooting purpose (optional):
     
         ```
         [DEFAULT]
@@ -152,9 +147,10 @@ Go to:
 5. Remove the unused default SQLite database (created by the package at the installation):  
     `rm -f /var/lib/nova/nova.sqlite`
 
-#### Compute node install
+#### Compute node installation
+
 1. Install the packages:  
-    `apt-get install nova-compute sysfsutils`
+    `apt-get install nova-compute-kvm`
 2. Modify /etc/nova/nova.conf to:  
     1. Configure RabbitMQ message broker access:
     
@@ -162,7 +158,8 @@ Go to:
         [DEFAULT]
         ...
         rpc_backend = rabbit
-        rabbit_host = controller
+        rabbit_host = core
+        rabbit_userid = guest
         rabbit_password = RABBIT_PASS
         ```
     Replacing _RABBIT_PASS_ with the password the password you chose for the guest account in RabbitMQ.
@@ -174,10 +171,15 @@ Go to:
         auth_strategy = keystone
         ```
         ```
+        [database]
+        connection = mysql://nova:NOVA_DBPASS@database/nova
+        ```
+        Replacing _NOVA_DBPASS_ with the password you chose for the nova database.  
+        ```
         [keystone_authtoken]
         ...
-        auth_uri = http://controller:5000
-        auth_host = controller
+        auth_uri = http://core:5000
+        auth_host = core
         auth_port = 35357
         auth_protocol = http
         admin_tenant_name = service
@@ -192,7 +194,7 @@ Go to:
         ...
         my_ip = MANAGEMENT_INTERFACE_IP_ADDRESS
         ```
-    Replacing _MANAGEMENT_INTERFACE_IP_ADDRESS_ with the IP address of the management interface of the compute node. (In this example 10.10.10.31)
+    Replacing _MANAGEMENT_INTERFACE_IP_ADDRESS_ with the IP address of the management interface of the compute node. (In this example 10.79.6.9->12)
     4. Enable and configure remote console access:
     
         ```
@@ -201,16 +203,16 @@ Go to:
         vnc_enabled = True
         vncserver_listen = 0.0.0.0
         vncserver_proxyclient_address = MANAGEMENT_INTERFACE_IP_ADDRESS
-        novncproxy_base_url = http://controller:6080/vnc_auto.html
+        novncproxy_base_url = http://core:6080/vnc_auto.html
         ```
     The server component listens on all IP addresses and the proxy component only listens on the management interface IP address of the compute node. The base URL indicates the location where you can use a web browser to access remote consoles of instances on this compute node.  
-    Replacing _MANAGEMENT_INTERFACE_IP_ADDRESS_ with the IP address of the management interface of the compute node. (In this example 10.10.10.31)
+    Replacing _MANAGEMENT_INTERFACE_IP_ADDRESS_ with the IP address of the management interface of the compute node. (In this example 10.79.6.9->12)
     5. Configure the location of the Image service:
     
         ```
         [DEFAULT]
         ...
-        glance_host = controller
+        glance_host = store
         ```
     6. Set the logging to verbose for troubleshooting purpose (optional):
     
@@ -220,7 +222,7 @@ Go to:
         verbose=True
         ```
 3. Determine whether your compute node supports hardware acceleration for virtual machines:  
-    `egrep -c '(vmx|svm)' /proc/cpuinfo`  
+    `egrep -c '(vmx|svm)' /proc/cpuinfo` or `kvm-ok`  
 If this command returns a value of one or greater, your compute node supports hardware acceleration which typically requires no additional configuration.  
 If this command returns a value of zero, your compute node does not support hardware acceleration and you must configure libvirt to use QEMU instead of KVM.
     1. Modify /etc/nova/nova-compute.conf to configure libvirt to use QEMU instead of KVM:
@@ -230,7 +232,7 @@ If this command returns a value of zero, your compute node does not support hard
         ...
         virt_type = qemu
         ```
-4. Restart the Compute service:  
-    `service nova-compute restart`
-5. Remove the unused default SQLite database (created by the package at the installation):  
+4. Remove the unused default SQLite database (created by the package at the installation):  
     `rm -f /var/lib/nova/nova.sqlite`
+5. Restart the Compute service:  
+    `service nova-compute restart`

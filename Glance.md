@@ -31,7 +31,7 @@ Before you install and configure the Image Service, you must create a database a
         GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'%' IDENTIFIED BY 'GLANCE_DBPASS';
         ```
   Replacing _GLANCE_DBPASS_ with a suitable password.
-2. Source the admin credentials to gain access to admin-only CLI commands **one the Core VM**:  
+2. Source the admin credentials to gain access to admin-only CLI commands **on the Core VM**:  
     `source admin-openrc.sh`
 3. Create the Identity service credentials **on the Core VM**:
     1. Create _glance_ user:  
