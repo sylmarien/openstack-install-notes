@@ -21,12 +21,6 @@ Basic configuration is described in the [Controller.md](https://github.com/sylma
 2. Enable the OpenStack repository (not necessary on Ubuntu 14.04 since Icehouse is the default version):  
   `add-apt-repository cloud-archive:icehouse`
 
-## Keystone Configuration
-
-## Nova Configuration
-
-## Neutron Configuration
-
 **Messaging server**  
 We use RabbitMQ as message broker service.
 
@@ -38,3 +32,17 @@ We use RabbitMQ as message broker service.
 
 **Note:** During development, we use the guest account that is automatically created by RabbitMQ, but for production, we should create a unique user with suitable password.  
 Then, we would have to configure the _rabbit_userid_ and _rabbit_password_ keys accordingly in the configuration files of each OpenStack service that use the message broker.
+
+## Keystone Configuration
+
+Follow instructions at [keystone.md](https://github.com/sylmarien/openstack-install-notes/blob/master/Keystone.md).
+
+## Nova Configuration
+
+Please set up Glance before setting up Nova.
+
+Follow instructions at [Nova.md](https://github.com/sylmarien/openstack-install-notes/blob/master/Nova.md#core-vm-installation)
+
+## Neutron Configuration
+
+Follow instructions at [Neutron.md](https://github.com/sylmarien/openstack-install-notes/blob/master/Neutron.md#core-vm-install)
