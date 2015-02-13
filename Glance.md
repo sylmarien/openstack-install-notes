@@ -13,6 +13,7 @@ As of now, I follow the instructions of the documentation at this page:
 #### List of installed modules
 - glance-api
 - glance-registry
+- python-mysqldb
 
 #### Install steps:
 **prerequisites:** Identity service (Keystone)  
@@ -30,9 +31,9 @@ Before you install and configure the Image Service, you must create a database a
         GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'%' IDENTIFIED BY 'GLANCE_DBPASS';
         ```
   Replacing _GLANCE_DBPASS_ with a suitable password.
-2. Source the admin credentials to gain access to admin-only CLI commands:  
+2. Source the admin credentials to gain access to admin-only CLI commands **one the Core VM**:  
     `source admin-openrc.sh`
-3. Create the Identity service credentials:
+3. Create the Identity service credentials **on the Core VM**:
     1. Create _glance_ user:  
         `keystone user-create --name glance --pass GLANCE_PASS`  
     Replacing _GLANCE_PASS_ by a suitable password.
@@ -40,23 +41,23 @@ Before you install and configure the Image Service, you must create a database a
         `keystone user-role-add --user glance --tenant service --role admin`
     3. Create the _glance_ service:  
         `keystone service-create --name glance --type image --description "OpenStack Image Service"`
-4. Create the Identity service endpoint:
+4. Create the Identity service endpoint **on the Core VM**:
 
     ```
-    keystone endpoint-create --service-id $(keystone service-list | awk '/ image / {print $2}') --publicurl http://controller:9292 --internalurl http://controller:9292 --adminurl http://controller:9292 --region regionOne
+    keystone endpoint-create --service-id $(keystone service-list | awk '/ image / {print $2}') --publicurl http://core:9292 --internalurl http://core:9292 --adminurl http://core:9292 --region regionOne
     ```
     
 **Install and configure the Image Service (Glance) components**
 
 1. Install the packages:  
-    `apt-get install glance python-glanceclient`
-2. Modify /etc/glance/glance-api.conf to:
+    `apt-get install glance python-glanceclient python-mysqldb`
+2. Modify /etc/glance/glance-api.conf to:  
     1. Configure database acccess:
     
         ```
         [database]
         ...
-        connection = mysql://glance:GLANCE_DBPASS@controller/glance
+        connection = mysql://glance:GLANCE_DBPASS@database/glance
         ```
     Replacing _GLANCE_DBPASS_ with the password you chose for the Image Service database.
     2. Configure Identity service access:
@@ -64,8 +65,8 @@ Before you install and configure the Image Service, you must create a database a
         ```
         [keystone_authtoken]
         ...
-        auth_uri = http://controller:5000
-        auth_host = controller
+        auth_uri = http://core:5000
+        auth_host = core
         auth_port = 35357
         auth_protocol = http
         admin_tenant_name = service
@@ -75,41 +76,6 @@ Before you install and configure the Image Service, you must create a database a
         ```
         [paste_deploy]
         ...  
-        flavor = keystone
-        ```  
-        Replacing _GLANCE_PASS_ with the password you chose for the _glance_ user in the Identity service.
-    3. Set the logging to verbose for troubleshooting purpose (optional):
-    
-    ```
-    [DEFAULT]
-    ...
-    verbose=True
-    ```
-3. Modify /etc/glance/glance-registry.conf to:
-    1. Configure database access:
-    
-        ```
-        [database]
-        ...
-        connection = mysql://glance:GLANCE_DBPASS@controller/glance
-        ```  
-        Replacing _GLANCE_DBPASS_ with the password you chose for the Image Service database.
-    2. Configure the Identity service access:
-    
-        ```
-        [keystone_authtoken]
-        ...
-        auth_uri = http://controller:5000
-        auth_host = controller
-        auth_port = 35357
-        auth_protocol = http
-        admin_tenant_name = service
-        admin_user = glance
-        admin_password = GLANCE_PASS
-        ```  
-        ```
-        [paste_deploy]
-        ...
         flavor = keystone
         ```  
         Replacing _GLANCE_PASS_ with the password you chose for the _glance_ user in the Identity service.
@@ -123,6 +89,41 @@ Before you install and configure the Image Service, you must create a database a
         ```  
         **_file_ will be changed for the final deployment to support the Object storage or OpenStack.**
     4. Set the logging to verbose for troubleshooting purpose (optional):
+    
+        ```
+        [DEFAULT]
+        ...
+        verbose=True
+        ```
+3. Modify /etc/glance/glance-registry.conf to:
+    1. Configure database access:
+    
+        ```
+        [database]
+        ...
+        connection = mysql://glance:GLANCE_DBPASS@database/glance
+        ```  
+        Replacing _GLANCE_DBPASS_ with the password you chose for the Image Service database.
+    2. Configure the Identity service access:
+    
+        ```
+        [keystone_authtoken]
+        ...
+        auth_uri = http://core:5000
+        auth_host = core
+        auth_port = 35357
+        auth_protocol = http
+        admin_tenant_name = service
+        admin_user = glance
+        admin_password = GLANCE_PASS
+        ```  
+        ```
+        [paste_deploy]
+        ...
+        flavor = keystone
+        ```  
+        Replacing _GLANCE_PASS_ with the password you chose for the _glance_ user in the Identity service.
+    3. Set the logging to verbose for troubleshooting purpose (optional):
     
         ```
         [DEFAULT]

@@ -13,6 +13,7 @@ As of now, I follow the instructions of the documentation at this page:
 #### List of installed modules:
 - keystone
 - python-keystoneclient
+- python-mysqldb
 
 #### Installation steps:
 1. Create and configure database **on the database VM**
@@ -31,7 +32,7 @@ As of now, I follow the instructions of the documentation at this page:
     `openssl rand -hex 10`
     c05d9f83c7bcd1af3cce
 3. Install the packages:  
-    `apt-get install keystone python-keystoneclient`
+    `apt-get install keystone python-keystoneclient python-mysqldb`
 4. Modify /etc/keystone/keystone.conf to:
     1. Configure temporary admin access:
     
@@ -46,7 +47,7 @@ As of now, I follow the instructions of the documentation at this page:
         ```
         [database]
         ...
-        connection = mysql://keystone:KEYSTONE_DBPASS@controller/keystone
+        connection = mysql://keystone:KEYSTONE_DBPASS@database/keystone
         ```
     where _KEYSTONE_DBPASS_ is the password for the database.
     3. Set the logging to verbose for troubleshooting purpose (optional):
@@ -119,7 +120,7 @@ OpenStack provides three API endpoint variations for each service: admin, intern
 2. Create the API endpoint for the Identity service (Keystone):
 
     ```
-    keystone endpoint-create --service-id $(keystone service-list | awk '/ identity / {print $2}') --publicurl http://controller:5000/v2.0 --internalurl http://controller:5000/v2.0 --adminurl http://controller:35357/v2.0 --region regionOne
+    keystone endpoint-create --service-id $(keystone service-list | awk '/ identity / {print $2}') --publicurl http://core:5000/v2.0 --internalurl http://core:5000/v2.0 --adminurl http://core:35357/v2.0 --region regionOne
     ```
 
 **Client Environment scripts**
@@ -132,7 +133,7 @@ Admin script: in a file (named for example *admin-openrc.sh*) write the followin
 export OS_TENANT_NAME=admin
 export OS_USERNAME=admin
 export OS_PASSWORD=ADMIN_PASS
-export OS_AUTH_URL=http://controller:35357/v2.0
+export OS_AUTH_URL=http://core:35357/v2.0
 ```  
 Replacing _ADMIN_PASS_ with your admin password.
 
