@@ -68,9 +68,12 @@ Before installing and configure Neutron, we must create a database and Identity 
 
 **Installation and configuration of the Network components**
 
-1. Install the packages:  
-  `apt-get install neutron-server neutron-plugin-ml2 neutron-plugin-ml2 neutron-plugin-openvswitch-agent neutron-l3-agent neutron-dhcp-agent`
-2. Modify /etc/neutron/neutron.conf to:
+1. Install the packages:
+
+  ```
+  apt-get install neutron-server neutron-plugin-ml2 neutron-plugin-ml2 neutron-plugin-openvswitch-agent neutron-l3-agent neutron-dhcp-agent
+  ```
+2. Modify `/etc/neutron/neutron.conf` to:
   1. Configure database access:
     
     ```
@@ -86,6 +89,7 @@ Before installing and configure Neutron, we must create a database and Identity 
     ...
     rpc_backend = neutron.openstack.common.rpc.impl_kombu
     rabbit_host = core
+    rabbit_userid = guest
     rabbit_password = RABBIT_PASS
     ```  
     Replacing _RABBIT_PASS_ with the password you chose for the _guest_ account in RabbitMQ.
@@ -142,7 +146,7 @@ Before installing and configure Neutron, we must create a database and Identity 
     ...
     verbose = True
     ```
-3. By default, distribution packages configure Compute to use legacy networking. You must reconfigure Compute to manage networks through Networking. Modify /etc/nova/nova.conf to:
+3. By default, distribution packages configure Compute to use legacy networking. You must reconfigure Compute to manage networks through Networking. Modify `/etc/nova/nova.conf` to:
   1. Configure the APIs and drivers:
   
     ```
@@ -167,7 +171,7 @@ Before installing and configure Neutron, we must create a database and Identity 
     neutron_admin_password = NEUTRON_PASS
     ```  
     Replacing _NEUTRON_PASS_ with the password you chose for the _neutron_ user in the Identity service.
-4. Configure ML2 plug-in. Modify /etc/neutron/plugins/ml2/ml2_conf.ini to add the following keys:
+4. Configure ML2 plug-in. Modify `/etc/neutron/plugins/ml2/ml2_conf.ini` to add the following keys:
     
     ```
     [ml2]
@@ -194,7 +198,7 @@ Before installing and configure Neutron, we must create a database and Identity 
     tunnel_type = gre
     enable_tunneling = True
     ```  
-    Replacing _INSTANCE_TUNNELS_INTERFACE_IP_ADDRESS_ with the IP address of the instance tunnels network interface of the core VM.
+    Replacing _INSTANCE_TUNNELS_INTERFACE_IP_ADDRESS_ with the IP address of the instance tunnels network interface of the core VM. (Interface that is in the floating IPs network)
 5. Restart the Compute services:
 
   ```
@@ -219,7 +223,7 @@ Before installing and configure Neutron, we must create a database and Identity 
       ```
     3. Attempt to start the _neutron-server_ service again. You can return the _core_plugin_ and _service_plugins_ configuration keys to short plug-in names.
 7. Configure some kernel networking parameters:
-  1. Modify /etc/sysctl.conf to add the following parameters:
+  1. Modify `/etc/sysctl.conf` to add the following parameters:
 
     ```
     net.ipv4.ip_forward=1
@@ -228,7 +232,7 @@ Before installing and configure Neutron, we must create a database and Identity 
     ```
   2. Implement changes:  
     `sysctl -p`
-8. Configure the Layer-3 (L3) agent. Modify /etc/neutron/l3_agent.ini to:
+8. Configure the Layer-3 (L3) agent. Modify `/etc/neutron/l3_agent.ini` to:
   1. Configure the driver, enable network namespaces:
   
     ```
@@ -245,7 +249,7 @@ Before installing and configure Neutron, we must create a database and Identity 
     verbose = True
     ```
 9. Configure the DHCP agent.
-  1. Modify /etc/neutron/dhcp_agent.ini to:
+  1. Modify `/etc/neutron/dhcp_agent.ini` to:
     1. Configure the drivers and enable namespaces:
     
       ```
@@ -266,19 +270,19 @@ Before installing and configure Neutron, we must create a database and Identity 
   Tunneling protocols such as GRE include additional packet headers that increase overhead and decrease space available for the payload or user data. Without knowledge of the virtual network infrastructure, instances attempt to send packets using the default Ethernet maximum transmission unit (MTU) of 1500 bytes. Internet protocol (IP) networks contain the path MTU discovery (PMTUD) mechanism to detect end-to-end MTU and adjust packet size accordingly. However, some operating systems and networks block or otherwise lack support for PMTUD causing performance degradation or connectivity failure.  
 Ideally, you can prevent these problems by enabling jumbo frames on the physical network that contains your tenant virtual networks. Jumbo frames support MTUs up to approximately 9000 bytes which negates the impact of GRE overhead on virtual networks. However, many network devices lack support for jumbo frames and OpenStack administrators often lack control over network infrastructure. Given the latter complications, you can also prevent MTU problems by reducing the instance MTU to account for GRE overhead. Determining the proper MTU value often takes experimentation, but 1454 bytes works in most environments. You can configure the DHCP server that assigns IP addresses to your instances to also adjust the MTU.  
 **Note:** Some cloud images ignore the DHCP MTU option in which case you should configure it using metadata, script, or other suitable method.  
-      1. Modify /etc/neutron/dhcp_agent.ini to enable the dnsmask configuration file:
+      1. Modify /`etc/neutron/dhcp_agent.ini` to enable the dnsmask configuration file:
     
         ```
         [DEFAULT]
         ...
         dnsmasq_config_file = /etc/neutron/dnsmasq-neutron.conf
         ```
-      2. Create and edit /etc/neutron/dhcp_agent.ini to enable the DHCP MTU option (26) and configure it to 1454 bytes:  
+      2. Create and edit `/etc/neutron/dhcp_agent.ini` to enable the DHCP MTU option (26) and configure it to 1454 bytes:  
       `dhcp-option-force=26,1454`
       3. Kill any existing dnsmask processes:  
         `pkill dnsmask`
 10. Configure the metadata agent.
-  1. Modify /etc/neutron/metadata_agent.ini to:
+  1. Modify `/etc/neutron/metadata_agent.ini` to:
     1. Configure access parameters:
     
       ```
@@ -313,7 +317,7 @@ Ideally, you can prevent these problems by enabling jumbo frames on the physical
       ...
       verbose = True
       ```
-  2. Modify /etc/nova/nova.conf to enable the metadata proxy and configure the secret:
+  2. Modify `/etc/nova/nova.conf` to enable the metadata proxy and configure the secret:
   
     ```
     [DEFAULT]
@@ -332,13 +336,34 @@ The OVS service provides the underlying virtual networking framework for instanc
     `ovs-vsctl add-br br-int`
   3. Add the external bridge:  
     `ovs-vsctl add-br br-ex`
-  4. Add a port to the external bridge that connects to the physical external network interface:  
+  4. Modify `/etc/network/interfaces` to have the following content:
+
+    ```
+    auto eth0
+    iface eth0 inet manual
+        up ifconfig eth0 0.0.0.0 up
+        up ip link set eth0 promisc on
+        down ip link set eth0 promisc off
+        down ifconfig eth0 down
+
+    auto br-ex
+    iface br-ex inet static
+        address 10.79.7.2
+        netmask 255.255.0.0
+        network 10.79.0.0
+        broadcast 10.79.255.255
+        gateway 10.79.0.1
+        # dns-* options are implemented by the resolvconf package, if installed
+        dns-nameservers 10.28.0.4 10.28.0.5
+    ```
+  5. Add a port to the external bridge that connects to the physical external network interface:  
     `ovs-vsctl add-port br-ex INTERFACE_NAME`  
-  Replacing _INTERFACE_NAME_ with the actual interface name (in this example _eth3_)  
-  **Note:** Depending on your network interface driver, you may need to disable generic receive offload (GRO) to achieve suitable throughput between your instances and the external network.  
+  Replacing _INTERFACE_NAME_ with the actual interface name (in this example _eth0_)  
+  **Note (usually unnecessary):** Depending on your network interface driver, you may need to disable generic receive offload (GRO) to achieve suitable throughput between your instances and the external network.  
   To temporarily disable GRO on the external network interface while testing your environment:  
     `ethtool -K INTERFACE_NAME gro off`
-12. Restart the Networking services:
+  6. Reboot the server to apply this configuration.
+12. Restart the Networking services (not needed if the reboot has been done):
 
   ```
   service neutron-plugin-openvswitch-agent restart
@@ -352,7 +377,7 @@ The OVS service provides the underlying virtual networking framework for instanc
 #### Compute node install
 **Prerequisites:** Before you install and configure OpenStack Networking, you must configure certain kernel networking parameters.
 
-1. Modify /etc/sysctl.conf to add the following parameters:
+1. Modify `/etc/sysctl.conf` to add the following parameters:
 
   ```
   net.ipv4.conf.all.rp_filter=0
@@ -365,7 +390,7 @@ The OVS service provides the underlying virtual networking framework for instanc
 
 1. Install the packages:  
   `apt-get install neutron-common neutron-plugin-ml2 neutron-plugin-openvswitch-agent`
-2. Modify /etc/neutron/neutron.conf to:
+2. Modify `/etc/neutron/neutron.conf` to:
   1. Comment any _connection_ options in the `[database]` section because the compute nodes do not directly access the database.
   2. Configure RabbitMQ message broker access:
     
@@ -373,7 +398,7 @@ The OVS service provides the underlying virtual networking framework for instanc
     [DEFAULT]
     ...
     rpc_backend = neutron.openstack.common.rpc.impl_kombu
-    rabbit_host = controller
+    rabbit_host = core
     rabbit_password = RABBIT_PASS
     ```  
     Replacing _RABBIT_PASS_ with the password you chose for the _guest_ account in RabbitMQ.
@@ -412,7 +437,7 @@ The OVS service provides the underlying virtual networking framework for instanc
     ...
     verbose = True
     ```
-3. Configure the ML2 plug-in. Modify /etc/neutron/plugins/ml2/ml2_conf.ini to:
+3. Configure the ML2 plug-in. Modify `/etc/neutron/plugins/ml2/ml2_conf.ini` to:
   1. Enable the generic routing encapsulation (GRE) network type drivers, GRE tenant networks, and the OVS mechanism driver:
   
     ```
@@ -446,13 +471,13 @@ The OVS service provides the underlying virtual networking framework for instanc
     tunnel_type = gre
     enable_tunneling = True
     ```  
-    Replacing _INSTANCE_TUNNELS_INTERFACE_IP_ADDRESS_ with the IP address of the instance tunnels network interface on your compute node. (In this example 10.20.20.31)
+    Replacing _INSTANCE_TUNNELS_INTERFACE_IP_ADDRESS_ with the IP address of the instance tunnels network interface on your compute node. (Interface that is in the floating IPs network)
 4. Configure the Open vSwitch (OVS) service.
   1.Restart the OVS service:  
     `service openvswitch-switch restart`
   2. Add the integration bridge:  
     `ovs-vsctl add-br br-int`
-5. Configure Compute to use Networking. By default, distribution packages configure Compute to use legacy networking. You must reconfigure Compute to manage networks through Networking. Modify /etc/nova/nova.conf to:
+5. Configure Compute to use Networking. By default, distribution packages configure Compute to use legacy networking. You must reconfigure Compute to manage networks through Networking. Modify `/etc/nova/nova.conf` to:
   1. Configure the APIs and drivers:
   
     ```
