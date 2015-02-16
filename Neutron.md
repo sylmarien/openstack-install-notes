@@ -399,6 +399,7 @@ The OVS service provides the underlying virtual networking framework for instanc
     ...
     rpc_backend = neutron.openstack.common.rpc.impl_kombu
     rabbit_host = core
+    rabbit_userid = guest
     rabbit_password = RABBIT_PASS
     ```  
     Replacing _RABBIT_PASS_ with the password you chose for the _guest_ account in RabbitMQ.
