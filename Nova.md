@@ -28,8 +28,8 @@ Go to:
 
 **Compute node:**
 
-- nova-compute (nova-compute-kvm ??)
-- sysfsutils (????)
+- nova-compute-kvm
+- python-mysqldb
 
 #### Core VM installation
 **Prerequisites:** Before installing and configure Compute, we must create a database and Identity service credentials including endpoints.
@@ -150,7 +150,7 @@ Go to:
 #### Compute node installation
 
 1. Install the packages:  
-    `apt-get install nova-compute-kvm`
+    `apt-get install nova-compute-kvm python-mysqldb`
 2. Modify /etc/nova/nova.conf to:  
     1. Configure RabbitMQ message broker access:
     
