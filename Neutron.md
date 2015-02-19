@@ -329,6 +329,47 @@ Ideally, you can prevent these problems by enabling jumbo frames on the physical
   3. Restart the Compute API service:  
     `service nova-api restart`
 11. Configure the Open vSwitch (OVS) service.  
+  1. Restart the OVS service:  
+    `service openvswitch-switch restart`
+  2. Modify `/etc/network/interfaces` to have only eth0 configured:
+
+    ```
+    # The primary network interface
+    auto eth0
+    iface eth0 inet static
+      address 10.79.7.2
+      netmask 255.255.0.0
+      network 10.79.0.0
+      broadcast 10.79.255.255
+      gateway 10.79.0.1
+      # dns-* options are implemented by the resolvconf package, if installed#  
+      dns-nameservers 10.28.0.4 10.28.0.5
+    ```
+  3. Execute the following steps **on the core VM** (indications taken from this [source](https://fosskb.wordpress.com/2014/06/10/managing-openstack-internaldataexternal-network-in-one-interface/)):
+
+    ```
+    #add all bridges
+    ovs-vsctl add-br br-int
+    ovs-vsctl add-br br-ex
+    ovs-vsctl add-br br-eth1
+    ovs-vsctl add-br br-proxy
+    #Create Veth pairs
+    ip link add proxy-br-eth1 type veth peer name eth1-br-proxy
+    ip link add proxy-br-ex type veth peer name ex-br-proxy
+    #Attach bridges using veth pair
+    ovs-vsctl add-port br-eth1 eth1-br-proxy
+    ovs-vsctl add-port br-ex ex-br-proxy
+    ovs-vsctl add-port br-proxy proxy-br-eth1
+    ovs-vsctl add-port br-proxy proxy-br-ex
+    #Assign eth0's ip address to br-proxy
+    ifconfig br-proxy  up
+    #Bring up the interfaces 
+    ip link set eth1-br-proxy up promisc on
+    ip link set ex-br-proxy up promisc on
+    ip link set proxy-br-eth1 up promisc on
+    ip link set proxy-br-ex up promisc on
+    ```
+OLD VERSION (maybe valid when we'll have all the physical networks and IPs):
 The OVS service provides the underlying virtual networking framework for instances. The integration bridge br-int handles internal instance network traffic within OVS. The external bridge br-ex handles external instance network traffic within OVS. The external bridge requires a port on the physical external network interface to provide instances with external network access. In essence, this port bridges the virtual and physical external networks in your environment.
   1. Restart the OVS service:  
     `service openvswitch-switch restart`
@@ -507,12 +548,42 @@ The OVS service provides the underlying virtual networking framework for instanc
   `service nova-compute restart`
 7. Restart the Open vSwitch (OVS) agent:  
   `service neutron-plugin-openvswitch-agent restart`
+8. TEMPORARY: Execute the following steps **on the compute node** (indications from the same [source](https://fosskb.wordpress.com/2014/06/10/managing-openstack-internaldataexternal-network-in-one-interface/)):
+  1. Execute the following commands (network will be broken at some point until you finish all manipulations)
+    ```
+    ovs-vsctl add-br br-eth1
+    ovs-vsctl add-port br-eth1 em1
+    #Assign em1's ip addres to br-eth1
+    ifconfig br-eth1 SERVER_IP up
+    #Bring up the interfaces
+    ip link set em1 up promisc on
+    ```
+  2. Modify `/etc/network/interfaces` to fit the following content:
 
+    ```
+    auto em1
+    iface em1 inet manual
+      up ifconfig em1 0.0.0.0 up
+      up ip link set em1 promisc on
+      down ip link set em1 promisc off
+      down ifconfig em1 down
+
+
+    auto br-eth1
+    iface br-eth1 inet static
+      address 10.79.6.9
+      netmask 255.255.0.0
+      broadcast 10.79.255.255
+      gateway 10.79.0.1
+      dns-nameservers 10.28.0.4 10.28.0.5
+      dns-search uni.lux
+    ```
+  3. Reboot the server.
 
 ========
 
 #### Initial networks creation
-1. External network. **On the Controller node**  
+1. External network. **On the core VM**  
 The external network typically provides Internet access for your instances. By default, this network only allows Internet access _from_ instances using Network Address Translation (NAT). You can enable Internet access _to_ individual instances using a floating IP address and suitable security group rules. The admin tenant owns this network because it provides external network access for multiple tenants. You must also enable sharing to allow access by those tenants.
   1. Create the external network:
     1. Source the _admin_ credentials to gain access to admin-only CLI commands:  
@@ -524,21 +595,21 @@ The external network typically provides Internet access for your instances. By d
     ```
     neutron subnet-create ext-net --name ext-subnet --allocation-pool start=FLOATING_IP_START,end=FLOATING_IP_END --disable-dhcp --gateway EXTERNAL_NETWORK_GATEWAY EXTERNAL_NETWORK_CIDR
     ```  
-    Replacing _FLOATING_IP_START_ and _FLOATING_IP_END_ with the first and last IP addresses of the range that you want to allocate for floating IP addresses. Replace _EXTERNAL_NETWORK_CIDR_ with the subnet associated with the physical network. Replace _EXTERNAL_NETWORK_GATEWAY_ with the gateway associated with the physical network, typically the ".1" IP address. You should disable DHCP on this subnet because instances do not connect directly to the external network and floating IP addresses require manual assignment.
-2. Tenant network. **On the Controller node**  
+    Replacing _FLOATING_IP_START_ (10.79.7.100) and _FLOATING_IP_END_ (10.79.7.200) with the first and last IP addresses of the range that you want to allocate for floating IP addresses. Replace _EXTERNAL_NETWORK_CIDR_ (10.79.0.0/16) with the subnet associated with the physical network. Replace _EXTERNAL_NETWORK_GATEWAY_ (10.79.0.1) with the gateway associated with the physical network, typically the ".1" IP address. You should disable DHCP on this subnet because instances do not connect directly to the external network and floating IP addresses require manual assignment.
+2. Tenant network. **On the core VM**  
 The tenant network provides internal network access for instances. The architecture isolates this type of network from other tenants. The demo tenant owns this network because it only provides network access for instances within it.
   1. Create the tenant network:  
-    `neutron net-create demo-net`
+    `neutron net-create etriks-net`
   2. Create a subnet on the tenant network:
     
     ```
-    neutron subnet-create demo-net --name demo-subnet --gateway TENANT_NETWORK_GATEWAY TENANT_NETWORK_CIDR
+    neutron subnet-create etriks-net --name etriks-subnet --gateway TENANT_NETWORK_GATEWAY TENANT_NETWORK_CIDR
     ```  
-    Replacing _TENANT_NETWORK_CIDR_ with the subnet you want to associate with the tenant network and _TENANT_NETWORK_GATEWAY_ with the gateway you want to associate with it, typically the ".1" IP address.
+    Replacing _TENANT_NETWORK_CIDR_ (192.168.100.0/24) with the subnet you want to associate with the tenant network and _TENANT_NETWORK_GATEWAY_ (192.168.100.1) with the gateway you want to associate with it, typically the ".1" IP address.
 3. Create a router on the tenant network and attach the external and tenant network to it:
   1. Create the router:
-    `neutron router-create demo-router`
-  2. Attach the router to the demo tenant subnet:  
-    `neutron router-interface-add demo-router demo-subnet`
+    `neutron router-create etriks-router`
+  2. Attach the router to the etriks tenant subnet:  
+    `neutron router-interface-add etriks-router etriks-subnet`
   3. Attach the router to the external network by setting it as the gateway:  
-    `neutron router-gateway-set demo-router ext-net`
+    `neutron router-gateway-set etriks-router ext-net`

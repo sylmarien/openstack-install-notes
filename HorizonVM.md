@@ -15,3 +15,8 @@ Basic configuration is described in the [Controller.md](https://github.com/sylma
   `apt-get install python-software-properties`
 2. Enable the OpenStack repository (not necessary on Ubuntu 14.04 since Icehouse is the default version):  
   `add-apt-repository cloud-archive:icehouse`
+
+
+## OpenStack Dashboard (Horizon) installation
+
+Follow the steps described in [Horizon.md](https://github.com/sylmarien/openstack-install-notes/blob/master/Horizon.md)
