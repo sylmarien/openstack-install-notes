@@ -10,37 +10,66 @@ This file contains notes on the Compute nodes of the architecture. Among others,
 
 The network configuration for these nodes is the following:  
 
-- em1: 10.79.6.9->12
+- em1: 10.89.200.11->14
+- em2: 10.89.210.11->14
 
 **Configure networking**
 
-1. Content of /etc//network/interfaces should look like:
+1. Content of `/etc//network/interfaces` should look like:
   
     ```
-    auto em1
-    iface em1 inet static
-        address 10.79.6.12
-        netmask 255.255.0.0
-        broadcast 10.79.255.255
-        gateway 10.79.0.1
-        dns-nameservers 10.28.0.4 10.28.0.5
-        dns-search uni.lux
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+auto em1
+iface em1 inet manual
+  up ifconfig em1 0.0.0.0 up
+  up ip link set em1 promisc on
+  down ip link set em1 promisc off
+  down ifconfig em1 down
+
+auto br-eth1
+iface br-eth1 inet static
+  address 10.89.200.11
+  netmask 255.255.0.0
+  broadcast 10.89.255.255
+  gateway 10.89.0.1
+  dns-nameservers 10.28.0.4 10.28.0.5
+  dns-search uni.lux
+
+auto em2
+iface em2 inet static
+  address 10.89.210.11
+  netmask 255.255.255.0
+  broadcast 10.89.210.255
     ```
 2. Modify /etc/hosts to configure the name resolution:
 
   ```
-  # Horizon
-  10.79.7.1       horizon
+127.0.0.1 localhost
 
-  # Core
-  10.79.7.2       core
+# Controller nodes
+10.89.200.1       openstack-ctrl1
+10.89.200.2       openstack-ctrl2
 
-  # Store
-  10.79.7.3       store
+# Compute nodes
+10.89.200.11      openstack-comp1
+10.89.200.12      openstack-comp2
+10.89.200.13      openstack-comp3
+10.89.200.14      openstack-comp4
 
-  # Database
-  10.79.7.4       database
+# Horizon
+10.89.201.2       horizon
 
+# Core
+10.89.201.1       core
+
+# Store
+10.89.201.3       store
+
+# Database
+10.89.201.4       database
   ```
 3. Reboot to activate changes.
 
@@ -49,13 +78,13 @@ The network configuration for these nodes is the following:
 1. Install the NTP service:  
   `apt-get update && apt-get dist-upgrade && apt-get install ntp`
 2. Configure the NTP service:
-  1. Modify /etc/ntp.conf to comment or remove all server key but one to reference the controller node:
+  1. Modify `/etc/ntp.conf` to comment or remove all server key but one to reference the controller node:
 
       ```
       # OpenStack architecture reference
       server openstack-ctrl1 iburst dynamic
       ```
-  2. Remove the /var/lib/ntp/ntp.conf.dhcp file if it exists.
+  2. Remove the `/var/lib/ntp/ntp.conf.dhcp` file if it exists.
 3. Restart the NTP service:  
   `service ntp restart`
 

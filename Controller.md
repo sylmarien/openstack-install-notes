@@ -17,8 +17,10 @@ The system has been set up on an a disk managed through LVM with the following c
 
 The network configuration for this node is the following:  
 
-- em1 : physical interface connect to the network
+- em1: prod network (physical interface)
+- em2: data network (physical interface)
 - br0: virtual interface (bridge) used to connect all the VMs to em1
+- br1: virtual interface (brigde) used to connect all the VMs to em2
 
 **Configure networking**
 
@@ -29,38 +31,62 @@ The network configuration for this node is the following:
 auto lo
 iface lo inet loopback
 
-# Set up interfaces manually, avoiding conflicts with, e.g., network manager
+# em1 - prod network
 auto em1
 iface em1 inet manual
+        up ifconfig em1 0.0.0.0 up
+        up ip link set em1 promisc on
+        down ip link set em1 promisc off
+        down ifconfig em1 down
 
-# Bridge setup
+# em2 - data network 
+auto em2
+iface em2 inet manual
+        up ifconfig em2 0.0.0.0 up
+        up ip link set em2 promisc on
+        down ip link set em2 promisc off
+        down ifconfig em2 down
+
+
+# Bridges to set the service VMs in
+
 auto br0
 iface br0 inet static
   bridge_ports em1
-  address 10.79.6.7
+  bridge_stp      off
+  bridge_maxwait  0
+  bridge_fd       0
+  address 10.89.200.1
   netmask 255.255.0.0
-  broadcast 10.79.255.255
-  gateway 10.79.0.1
+  broadcast 10.89.255.255
+  gateway 10.89.0.1
   dns-nameservers 10.28.0.4 10.28.0.5
   dns-search uni.lux
+
+auto br1
+iface br1 inet static
+  bridge_ports em2
+  bridge_stp      off
+  bridge_maxwait  0
+  bridge_fd       0
+  address 10.89.210.1
+  netmask 255.255.0.0
+  broadcast 10.89.255.255
   ```
 2. Modify /etc/hosts to configure the name resolution:
 
   ```
-127.0.0.1       localhost
-127.0.1.1       openstack-ctrl1
+127.0.0.1 localhost
 
-# Horizon
-10.79.7.1       horizon
+# Controller nodes
+10.89.200.1       openstack-ctrl1
+10.89.200.2       openstack-ctrl2
 
-# Core
-10.79.7.2       core
-
-# Store
-10.79.7.3       store
-
-# Database
-10.79.7.4       database
+# Compute nodes
+10.89.200.11      openstack-comp1
+10.89.200.12      openstack-comp2
+10.89.200.13      openstack-comp3
+10.89.200.14      openstack-comp4
   ```
 3. Reboot to activate changes.
 
@@ -90,26 +116,26 @@ lvcreate -n database -L 50G vg0
 4. Create the VMs using the ubuntu server image and the virt-install command:
 
   ```
-virt-install --name=horizon --description="VM hosting the OpenStack Horizon service." --ram=4096 --vcpus=3 --os-variant=ubuntutrusty --location /home/localadmin/ubuntu-14.04.1-server-amd64.iso --extra-args='console=tty0 console=ttyS0,115200n8 serial' --disk path=/dev/vg0/horizon --hvm --network bridge=br0 --autostart --nographics
-virt-install --name=core --description="VM hosting the OpenStack core services: Nova, Neutron, Keystone, RabbitMQ." --ram=4096 --vcpus=3 --os-variant=ubuntutrusty --location /home/localadmin/ubuntu-14.04.1-server-amd64.iso --extra-args='console=tty0 console=ttyS0,115200n8 serial' --disk path=/dev/vg0/core --hvm --network bridge=br0 --autostart --nographics
-virt-install --name=store --description="VM hosting the OpenStack storage services: Glance, Cinder, Swift." --ram=4096 --vcpus=3 --os-variant=ubuntutrusty --location /home/localadmin/ubuntu-14.04.1-server-amd64.iso --extra-args='console=tty0 console=ttyS0,115200n8 serial' --disk path=/dev/vg0/store --hvm --network bridge=br0 --autostart --nographics
-virt-install --name=database --description="VM hosting the OpenStack database." --ram=4096 --vcpus=3 --os-variant=ubuntutrusty --location /home/localadmin/ubuntu-14.04.1-server-amd64.iso --extra-args='console=tty0 console=ttyS0,115200n8 serial' --disk path=/dev/vg0/database --hvm --network bridge=br0 --autostart --nographics
+virt-install --name=horizon --description="VM hosting the OpenStack Horizon service." --ram=4096 --vcpus=3 --os-variant=ubuntutrusty --location /home/localadmin/ubuntu-14.04.1-server-amd64.iso --extra-args='console=tty0 console=ttyS0,115200n8 serial' --disk path=/dev/vg0/horizon --hvm --network bridge=br0 --network bridge=br1 --autostart --nographics
+virt-install --name=core --description="VM hosting the OpenStack core services: Nova, Neutron, Keystone, RabbitMQ." --ram=4096 --vcpus=3 --os-variant=ubuntutrusty --location /home/localadmin/ubuntu-14.04.1-server-amd64.iso --extra-args='console=tty0 console=ttyS0,115200n8 serial' --disk path=/dev/vg0/core --hvm --network bridge=br0 --network bridge=br1 --autostart --nographics
+virt-install --name=store --description="VM hosting the OpenStack storage services: Glance, Cinder, Swift." --ram=4096 --vcpus=3 --os-variant=ubuntutrusty --location /home/localadmin/ubuntu-14.04.1-server-amd64.iso --extra-args='console=tty0 console=ttyS0,115200n8 serial' --disk path=/dev/vg0/store --hvm --network bridge=br0 --network bridge=br1 --autostart --nographics
+virt-install --name=database --description="VM hosting the OpenStack database." --ram=4096 --vcpus=3 --os-variant=ubuntutrusty --location /home/localadmin/ubuntu-14.04.1-server-amd64.iso --extra-args='console=tty0 console=ttyS0,115200n8 serial' --disk path=/dev/vg0/database --hvm --network bridge=br0 --network bridge=br1 --autostart --nographics
   ```
 5. For each of them follow the installation steps and configure them accordingly to the wanted configuration.  
-In our case, here are the majors informations (temporary):
+In our case, here are the majors informations:
 
   ```
 DNS:
 10.28.0.4
 10.28.0.5
 
-Gateway: 10.79.0.1
+Gateway: 10.89.0.1
 
 openstack-ctrl1:
-Horizon : 10.79.7.1 (hostname: horizon, no domain name). user: localadmin mdp: localadmin
-Core: 10.79.7.2 (hostname: core, no domain name). user: localadmin mdp: localadmin
-Store: 10.79.7.3 (hostname: store, no domain name). user: localadmin mdp: localadmin
-Database: 10.79.7.4 (hostname: database, no domain name). user: localadmin mdp: localadmin
+Horizon : 10.89.201.2 (hostname: horizon, no domain name). user: localadmin mdp: localadmin
+Core: 10.89.201.1 (hostname: core, no domain name). user: localadmin mdp: localadmin
+Store: 10.89.201.3 (hostname: store, no domain name). user: localadmin mdp: localadmin
+Database: 10.89.201.4 (hostname: database, no domain name). user: localadmin mdp: localadmin
   ```
 6. Once the VM are running, before connecting to them, make sure to make them launch automatically when the server boots:
 
@@ -124,20 +150,29 @@ virsh autostart database
   `virsh console horizon`
   2. Modify `/etc/hosts` with the following changes:  
     ```
-  # Controller node
-  10.79.6.7       openstack-ctrl1
+127.0.0.1 localhost
 
-  # Horizon
-  10.79.7.1       horizon
+# Controller nodes
+10.89.200.1       openstack-ctrl1
+10.89.200.2       openstack-ctrl2
 
-  # Core
-  10.79.7.2       core
+# Compute nodes
+10.89.200.11      openstack-comp1
+10.89.200.12      openstack-comp2
+10.89.200.13      openstack-comp3
+10.89.200.14      openstack-comp4
 
-  # Store
-  10.79.7.3       store
+# Horizon
+10.89.201.2       horizon
 
-  # Database
-  10.79.7.4       database
+# Core
+10.89.201.1       core
+
+# Store
+10.89.201.3       store
+
+# Database
+10.89.201.4       database
     ```
   3. Apply updates and install the ntp package as well as the mariadb-client package:  
   `apt-get update && apt-get dist-upgrade && apt-get install ntp mariadb-client`
