@@ -571,10 +571,10 @@ The OVS service provides the underlying virtual networking framework for instanc
 
     auto br-eth1
     iface br-eth1 inet static
-      address 10.79.6.9
+      address 10.89.200.11
       netmask 255.255.0.0
-      broadcast 10.79.255.255
-      gateway 10.79.0.1
+      broadcast 10.89.255.255
+      gateway 10.89.0.1
       dns-nameservers 10.28.0.4 10.28.0.5
       dns-search uni.lux
     ```
@@ -595,7 +595,7 @@ The external network typically provides Internet access for your instances. By d
     ```
     neutron subnet-create ext-net --name ext-subnet --allocation-pool start=FLOATING_IP_START,end=FLOATING_IP_END --disable-dhcp --gateway EXTERNAL_NETWORK_GATEWAY EXTERNAL_NETWORK_CIDR
     ```  
-    Replacing _FLOATING_IP_START_ (10.79.7.100) and _FLOATING_IP_END_ (10.79.7.200) with the first and last IP addresses of the range that you want to allocate for floating IP addresses. Replace _EXTERNAL_NETWORK_CIDR_ (10.79.0.0/16) with the subnet associated with the physical network. Replace _EXTERNAL_NETWORK_GATEWAY_ (10.79.0.1) with the gateway associated with the physical network, typically the ".1" IP address. You should disable DHCP on this subnet because instances do not connect directly to the external network and floating IP addresses require manual assignment.
+    Replacing _FLOATING_IP_START_ (10.89.1[01-99].1) and _FLOATING_IP_END_ (10.89.1[01-99].254) with the first and last IP addresses of the range that you want to allocate for floating IP addresses. Replace _EXTERNAL_NETWORK_CIDR_ (10.89.0.0/16) with the subnet associated with the physical network. Replace _EXTERNAL_NETWORK_GATEWAY_ (10.89.0.1) with the gateway associated with the physical network, typically the ".1" IP address. You should disable DHCP on this subnet because instances do not connect directly to the external network and floating IP addresses require manual assignment.
 2. Tenant network. **On the core VM**  
 The tenant network provides internal network access for instances. The architecture isolates this type of network from other tenants. The demo tenant owns this network because it only provides network access for instances within it.
   1. Create the tenant network:  
