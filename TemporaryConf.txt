@@ -4,10 +4,10 @@ DNS:
 10.28.0.4
 10.28.0.5
 
-Gateway: 10.79.0.1
+Gateway: 10.89.0.1
 
 openstack-ctrl1:
-Horizon : 10.79.7.1 (hostname: horizon, no domain name). user: localadmin mdp: localadmin
-Core: 10.79.7.2 (hostname: core, no domain name). user: localadmin mdp: localadmin
-Store: 10.79.7.3 (hostname: store, no domain name). user: localadmin mdp: localadmin
-Database: 10.79.7.4 (hostname: database, no domain name). user: localadmin mdp: localadmin
+Horizon : 10.89.201.2 (hostname: horizon, no domain name). user: localadmin mdp: localadmin
+Core: 10.89.201.1 (hostname: core, no domain name). user: localadmin mdp: localadmin
+Store: 10.89.201.3 (hostname: store, no domain name). user: localadmin mdp: localadmin
+Database: 10.89.201.4 (hostname: database, no domain name). user: localadmin mdp: localadmin
