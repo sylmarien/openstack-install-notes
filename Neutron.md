@@ -176,14 +176,14 @@ Before installing and configure Neutron, we must create a database and Identity 
     ```
     [ml2]
     ...
-    type_drivers = gre
-    tenant_network_types = gre
+    type_drivers = flat
+    tenant_network_types = flat
     mechanism_drivers = openvswitch
     ```
     ```
-    [ml2_type_gre]
+    [ml2_type_flat]
     ...
-    tunnel_id_ranges = 1:1000
+    flat_networks = *
     ```
     ```
     [securitygroup]
@@ -195,7 +195,7 @@ Before installing and configure Neutron, we must create a database and Identity 
     [ovs]
     ...
     local_ip = INSTANCE_TUNNELS_INTERFACE_IP_ADDRESS
-    tunnel_type = gre
+    tunnel_type = flat
     enable_tunneling = True
     ```  
     Replacing _INSTANCE_TUNNELS_INTERFACE_IP_ADDRESS_ with the IP address of the instance tunnels network interface of the core VM. (Interface that is in the floating IPs network)
@@ -270,7 +270,7 @@ Before installing and configure Neutron, we must create a database and Identity 
   Tunneling protocols such as GRE include additional packet headers that increase overhead and decrease space available for the payload or user data. Without knowledge of the virtual network infrastructure, instances attempt to send packets using the default Ethernet maximum transmission unit (MTU) of 1500 bytes. Internet protocol (IP) networks contain the path MTU discovery (PMTUD) mechanism to detect end-to-end MTU and adjust packet size accordingly. However, some operating systems and networks block or otherwise lack support for PMTUD causing performance degradation or connectivity failure.  
 Ideally, you can prevent these problems by enabling jumbo frames on the physical network that contains your tenant virtual networks. Jumbo frames support MTUs up to approximately 9000 bytes which negates the impact of GRE overhead on virtual networks. However, many network devices lack support for jumbo frames and OpenStack administrators often lack control over network infrastructure. Given the latter complications, you can also prevent MTU problems by reducing the instance MTU to account for GRE overhead. Determining the proper MTU value often takes experimentation, but 1454 bytes works in most environments. You can configure the DHCP server that assigns IP addresses to your instances to also adjust the MTU.  
 **Note:** Some cloud images ignore the DHCP MTU option in which case you should configure it using metadata, script, or other suitable method.  
-      1. Modify /`etc/neutron/dhcp_agent.ini` to enable the dnsmask configuration file:
+      1. Modify `/etc/neutron/dhcp_agent.ini` to enable the dnsmask configuration file:
     
         ```
         [DEFAULT]
@@ -337,11 +337,11 @@ Ideally, you can prevent these problems by enabling jumbo frames on the physical
     # The primary network interface
     auto eth0
     iface eth0 inet static
-      address 10.79.7.2
+      address 10.89.201.1
       netmask 255.255.0.0
-      network 10.79.0.0
-      broadcast 10.79.255.255
-      gateway 10.79.0.1
+      network 10.89.0.0
+      broadcast 10.89.255.255
+      gateway 10.89.0.1
       # dns-* options are implemented by the resolvconf package, if installed#  
       dns-nameservers 10.28.0.4 10.28.0.5
     ```
@@ -389,11 +389,11 @@ The OVS service provides the underlying virtual networking framework for instanc
 
     auto br-ex
     iface br-ex inet static
-        address 10.79.7.2
+        address 10.89.201.1
         netmask 255.255.0.0
-        network 10.79.0.0
-        broadcast 10.79.255.255
-        gateway 10.79.0.1
+        network 10.89.0.0
+        broadcast 10.89.255.255
+        gateway 10.89.0.1
         # dns-* options are implemented by the resolvconf package, if installed
         dns-nameservers 10.28.0.4 10.28.0.5
     ```
@@ -485,16 +485,16 @@ The OVS service provides the underlying virtual networking framework for instanc
     ```
     [ml2]
     ...
-    type_drivers = gre
-    tenant_network_types = gre
+    type_drivers = flat
+    tenant_network_types = flat
     mechanism_drivers = openvswitch
     ```
   2. Configure the tunnel identifier (id) range:
   
     ```
-    [ml2_type_gre]
+    [ml2_type_flat]
     ...
-    tunnel_id_ranges = 1:1000
+    flat_networks = *
     ```
   3. Enable security groups and configure the OVS iptables firewall driver:
   
@@ -510,7 +510,7 @@ The OVS service provides the underlying virtual networking framework for instanc
     [ovs]
     ...
     local_ip = INSTANCE_TUNNELS_INTERFACE_IP_ADDRESS
-    tunnel_type = gre
+    tunnel_type = flat
     enable_tunneling = True
     ```  
     Replacing _INSTANCE_TUNNELS_INTERFACE_IP_ADDRESS_ with the IP address of the instance tunnels network interface on your compute node. (Interface that is in the floating IPs network)

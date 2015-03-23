@@ -69,7 +69,7 @@ Go to:
     ```
     apt-get install nova-api nova-cert nova-conductor nova-consoleauth nova-novncproxy nova-scheduler python-novaclient python-mysqldb
     ```
-2. Modify /etc/nova/nova.conf to:
+2. Modify `/etc/nova/nova.conf` to:
     1. Configure database access:
     
         ```
@@ -117,7 +117,7 @@ Go to:
         vncserver_listen = MANAGEMENT_IP_ADDRESS
         vncserver_proxyclient_address = MANAGEMENT_IP_ADDRESS
         ```  
-        Replacing _MANAGEMENT_IP_ADDRESS_ with the IP address of the management interface. (10.79.7.2 in this temporary configuration).
+        Replacing _MANAGEMENT_IP_ADDRESS_ with the IP address of the management interface. (10.89.201.1 in this temporary configuration).
     5. Configure the location of the Image service:
     
         ```
@@ -194,7 +194,7 @@ Go to:
         ...
         my_ip = MANAGEMENT_INTERFACE_IP_ADDRESS
         ```
-    Replacing _MANAGEMENT_INTERFACE_IP_ADDRESS_ with the IP address of the management interface of the compute node. (In this example 10.79.6.9->12)
+    Replacing _MANAGEMENT_INTERFACE_IP_ADDRESS_ with the IP address of the management interface of the compute node. (In this example 10.89.200.11->14)
     4. Enable and configure remote console access:
     
         ```
@@ -206,7 +206,7 @@ Go to:
         novncproxy_base_url = http://core:6080/vnc_auto.html
         ```
     The server component listens on all IP addresses and the proxy component only listens on the management interface IP address of the compute node. The base URL indicates the location where you can use a web browser to access remote consoles of instances on this compute node.  
-    Replacing _MANAGEMENT_INTERFACE_IP_ADDRESS_ with the IP address of the management interface of the compute node. (In this example 10.79.6.9->12)
+    Replacing _MANAGEMENT_INTERFACE_IP_ADDRESS_ with the IP address of the management interface of the compute node. (In this example 10.89.200.11->14)
     5. Configure the location of the Image service:
     
         ```
