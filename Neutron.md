@@ -331,79 +331,68 @@ Ideally, you can prevent these problems by enabling jumbo frames on the physical
 11. Configure the Open vSwitch (OVS) service.  
   1. Restart the OVS service:  
     `service openvswitch-switch restart`
-  2. Modify `/etc/network/interfaces` to have only eth0 configured:
-
+  2. Add the external bridge:  
+    `ovs-vsctl add-br br-ex`
+  3. Add a port connecting this bridge to the interface of the VM and change the configuration accordingly (connectivity is going to be lost, so make sure your are not dependent on it. Or run all the following command at once in a script):  
     ```
+    ovs-vsctl add-port br-ex eth0
+    ifconfig eth0 0.0.0.0
+    ifconfig br-ex 10.89.201.1 netmask 255.255.0.0
+    route add default gw 10.89.0.1 br-ex
+    ifconfig eth1 down
+    ifconfig eth1 up
+    ```
+  4. Create the internal bridge:  
+    `ovs-vsctl add-br br-eth1`
+  5. Add a port connecting this bridge to the interface of the VM and change the configuration accordingly:  
+    ```
+    ovs-vsctl add-port br-eth1 eth1
+    ifconfig eth1 0.0.0.0
+    ifconfig br-eth1 10.89.211.1 netmask 255.255.0.0
+    ```
+  6. Modify `/etc/network/interfaces` to make these changes permanent:  
+    ```
+    # This file describes the network interfaces available on your system
+    # and how to activate them. For more information, see interfaces(5).
+
+    # The loopback network interface
+    auto lo
+    iface lo inet loopback
+
     # The primary network interface
     auto eth0
     iface eth0 inet static
-      address 10.89.201.1
-      netmask 255.255.0.0
-      network 10.89.0.0
-      broadcast 10.89.255.255
-      gateway 10.89.0.1
-      # dns-* options are implemented by the resolvconf package, if installed#  
-      dns-nameservers 10.28.0.4 10.28.0.5
-    ```
-  3. Execute the following steps **on the core VM** (indications taken from this [source](https://fosskb.wordpress.com/2014/06/10/managing-openstack-internaldataexternal-network-in-one-interface/)):
+      up ifconfig eth0 0.0.0.0 up
+      up ip link set eth0 promisc on
+      down ip link set eth0 promisc off
+      down ifconfig eth0 down
 
-    ```
-    #add all bridges
-    ovs-vsctl add-br br-int
-    ovs-vsctl add-br br-ex
-    ovs-vsctl add-br br-eth1
-    ovs-vsctl add-br br-proxy
-    #Create Veth pairs
-    ip link add proxy-br-eth1 type veth peer name eth1-br-proxy
-    ip link add proxy-br-ex type veth peer name ex-br-proxy
-    #Attach bridges using veth pair
-    ovs-vsctl add-port br-eth1 eth1-br-proxy
-    ovs-vsctl add-port br-ex ex-br-proxy
-    ovs-vsctl add-port br-proxy proxy-br-eth1
-    ovs-vsctl add-port br-proxy proxy-br-ex
-    #Assign eth0's ip address to br-proxy
-    ifconfig br-proxy  up
-    #Bring up the interfaces 
-    ip link set eth1-br-proxy up promisc on
-    ip link set ex-br-proxy up promisc on
-    ip link set proxy-br-eth1 up promisc on
-    ip link set proxy-br-ex up promisc on
-    ```
-OLD VERSION (maybe valid when we'll have all the physical networks and IPs):
-The OVS service provides the underlying virtual networking framework for instances. The integration bridge br-int handles internal instance network traffic within OVS. The external bridge br-ex handles external instance network traffic within OVS. The external bridge requires a port on the physical external network interface to provide instances with external network access. In essence, this port bridges the virtual and physical external networks in your environment.
-  1. Restart the OVS service:  
-    `service openvswitch-switch restart`
-  2. Add the integration bridge:  
-    `ovs-vsctl add-br br-int`
-  3. Add the external bridge:  
-    `ovs-vsctl add-br br-ex`
-  4. Modify `/etc/network/interfaces` to have the following content:
-
-    ```
-    auto eth0
-    iface eth0 inet manual
-        up ifconfig eth0 0.0.0.0 up
-        up ip link set eth0 promisc on
-        down ip link set eth0 promisc off
-        down ifconfig eth0 down
+    auto eth1
+    iface eth1 inet static
+      up ifconfig eth1 0.0.0.0 up
+      up ip link set eth1 promisc on
+      down ip link set eth1 promisc off
+      down ifconfig eth1 down
 
     auto br-ex
     iface br-ex inet static
-        address 10.89.201.1
-        netmask 255.255.0.0
-        network 10.89.0.0
-        broadcast 10.89.255.255
-        gateway 10.89.0.1
-        # dns-* options are implemented by the resolvconf package, if installed
-        dns-nameservers 10.28.0.4 10.28.0.5
+      bridge_ports eth0
+      address 10.89.201.1
+      netmask 255.255.0.0
+      broadcast 10.89.255.255
+      gateway 10.89.0.1
+      dns-nameservers 10.28.0.4 10.28.0.5
+      dns-search uni.lux
+
+    auto br-eth1
+    iface br-eth1 inet static
+      bridge_ports eth1
+      address 10.89.211.1
+      netmask 255.255.0.0
+      broadcast 10.89.255.255
     ```
-  5. Add a port to the external bridge that connects to the physical external network interface:  
-    `ovs-vsctl add-port br-ex INTERFACE_NAME`  
-  Replacing _INTERFACE_NAME_ with the actual interface name (in this example _eth0_)  
-  **Note (usually unnecessary):** Depending on your network interface driver, you may need to disable generic receive offload (GRO) to achieve suitable throughput between your instances and the external network.  
-  To temporarily disable GRO on the external network interface while testing your environment:  
-    `ethtool -K INTERFACE_NAME gro off`
-  6. Reboot the server to apply this configuration.
+  7. Restart the VM to apply all changes.
+    `sudo reboot`
 12. Restart the Networking services (not needed if the reboot has been done):
 
   ```
@@ -548,37 +537,6 @@ The OVS service provides the underlying virtual networking framework for instanc
   `service nova-compute restart`
 7. Restart the Open vSwitch (OVS) agent:  
   `service neutron-plugin-openvswitch-agent restart`
-8. TEMPORARY: Execute the following steps **on the compute node** (indications from the same [source](https://fosskb.wordpress.com/2014/06/10/managing-openstack-internaldataexternal-network-in-one-interface/)):
-  1. Execute the following commands (network will be broken at some point until you finish all manipulations)
-    ```
-    ovs-vsctl add-br br-eth1
-    ovs-vsctl add-port br-eth1 em1
-    #Assign em1's ip addres to br-eth1
-    ifconfig br-eth1 SERVER_IP up
-    #Bring up the interfaces
-    ip link set em1 up promisc on
-    ```
-  2. Modify `/etc/network/interfaces` to fit the following content:
-
-    ```
-    auto em1
-    iface em1 inet manual
-      up ifconfig em1 0.0.0.0 up
-      up ip link set em1 promisc on
-      down ip link set em1 promisc off
-      down ifconfig em1 down
-
-
-    auto br-eth1
-    iface br-eth1 inet static
-      address 10.89.200.11
-      netmask 255.255.0.0
-      broadcast 10.89.255.255
-      gateway 10.89.0.1
-      dns-nameservers 10.28.0.4 10.28.0.5
-      dns-search uni.lux
-    ```
-  3. Reboot the server.
 
 ========
 
