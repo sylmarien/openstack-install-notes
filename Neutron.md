@@ -183,8 +183,9 @@ Before installing and configure Neutron, we must create a database and Identity 
     ```
     [ml2_type_flat]
     ...
-    flat_networks = *
+    flat_networks = prod,data
     ```
+    That means that our network will be able to be create on physical networks named `prod` or `data`. Nothing else.
     ```
     [securitygroup]
     ...
@@ -478,13 +479,14 @@ Ideally, you can prevent these problems by enabling jumbo frames on the physical
     tenant_network_types = flat
     mechanism_drivers = openvswitch
     ```
-  2. Configure the tunnel identifier (id) range:
+  2. Configure the flat network provider possible names:
   
     ```
     [ml2_type_flat]
     ...
-    flat_networks = *
+    flat_networks = prod,data
     ```
+    That means that our network will be able to be create on physical networks named `prod` or `data`. Nothing else.
   3. Enable security groups and configure the OVS iptables firewall driver:
   
     ```
@@ -546,8 +548,8 @@ The external network typically provides Internet access for your instances. By d
   1. Create the external network:
     1. Source the _admin_ credentials to gain access to admin-only CLI commands:  
       `source admin-openrc.sh`
-    2. Create the network:
-      `neutron net-create ext-net --shared --router:external True`
+    2. Create the network:  
+      `neutron net-create ext-net --shared --router:external True --provider:network_type flat --provider:physical_network prod`
   2. Create a subnet on the external network:
     
     ```
