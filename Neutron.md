@@ -559,13 +559,13 @@ The external network typically provides Internet access for your instances. By d
 2. Tenant network. **On the core VM**  
 The tenant network provides internal network access for instances. The architecture isolates this type of network from other tenants. The demo tenant owns this network because it only provides network access for instances within it.
   1. Create the tenant network:  
-    `neutron net-create etriks-net`
+    `neutron net-create etriks-net --provider:network_type flat --provider:physical_network data`
   2. Create a subnet on the tenant network:
     
     ```
     neutron subnet-create etriks-net --name etriks-subnet --gateway TENANT_NETWORK_GATEWAY TENANT_NETWORK_CIDR
     ```  
-    Replacing _TENANT_NETWORK_CIDR_ (192.168.100.0/24) with the subnet you want to associate with the tenant network and _TENANT_NETWORK_GATEWAY_ (192.168.100.1) with the gateway you want to associate with it, typically the ".1" IP address.
+    Replacing _TENANT_NETWORK_CIDR_ (10.89.0[01-99].0/24) with the subnet you want to associate with the tenant network and _TENANT_NETWORK_GATEWAY_ (10.89.[01-99].1) with the gateway you want to associate with it, typically the ".1" IP address.
 3. Create a router on the tenant network and attach the external and tenant network to it:
   1. Create the router:
     `neutron router-create etriks-router`
