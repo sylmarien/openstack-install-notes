@@ -44,7 +44,7 @@ Before you install and configure the Image Service, you must create a database a
 4. Create the Identity service endpoint **on the Core VM**:
 
     ```
-    keystone endpoint-create --service-id $(keystone service-list | awk '/ image / {print $2}') --publicurl http://core:9292 --internalurl http://core:9292 --adminurl http://core:9292 --region regionOne
+    keystone endpoint-create --service-id $(keystone service-list | awk '/ image / {print $2}') --publicurl http://store:9292 --internalurl http://store:9292 --adminurl http://store:9292 --region regionOne
     ```
     
 **Install and configure the Image Service (Glance) components**
@@ -88,7 +88,14 @@ Before you install and configure the Image Service, you must create a database a
         filesystem_store_datadir = /var/lib/glance/images/
         ```  
         **_file_ will be changed for the final deployment to support the Object storage or OpenStack.**
-    4. Set the logging to verbose for troubleshooting purpose (optional):
+    4. Change RabbitMQ configuration:
+
+        ```
+        rabbit_host = core
+        rabbit_password = RABBIT_PASSWORD
+        ```
+        Where `RABBIT_PASSWORD` is the password for the RaabitMQ guest account.
+    5. Set the logging to verbose for troubleshooting purpose (optional):
     
         ```
         [DEFAULT]
