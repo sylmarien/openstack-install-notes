@@ -262,7 +262,7 @@ Configure some kernel networking parameters:
       admin_user = neutron
       admin_password = NEUTRON_PASS
       ```
-      Where _NEUTRON_PASS_ is the paswword you chose for the _neutron_ user in the Identity service.
+      Where _NEUTRON_PASS_ is the password you chose for the _neutron_ user in the Identity service.
     2. Configure Neutron to use the message broker:
 
       ```
@@ -306,39 +306,23 @@ Configure some kernel networking parameters:
     ...
     verbose = True
     ```
-4. Configure the DHCP agent.
-  1. Modify `/etc/neutron/dhcp_agent.ini` to:
-    1. Configure the drivers and enable namespaces:
-    
-      ```
-      [DEFAULT]
-      ...
-      interface_driver = neutron.agent.linux.interface.OVSInterfaceDriver
-      dhcp_driver = neutron.agent.linux.dhcp.Dnsmasq
-      use_namespaces = True
-      ```
-    2. Set the logging to verbose for troubleshooting purpose (optional):
+4. Configure the DHCP agent. Modifications applied in `/etc/neutron/dhcp_agent.ini`.
+  1. Configure the drivers and enable namespaces:
   
-      ```
-      [DEFAULT]
-      ...
-      verbose = True
-      ```
-  2. (Optionnal)  
-  Tunneling protocols such as GRE include additional packet headers that increase overhead and decrease space available for the payload or user data. Without knowledge of the virtual network infrastructure, instances attempt to send packets using the default Ethernet maximum transmission unit (MTU) of 1500 bytes. Internet protocol (IP) networks contain the path MTU discovery (PMTUD) mechanism to detect end-to-end MTU and adjust packet size accordingly. However, some operating systems and networks block or otherwise lack support for PMTUD causing performance degradation or connectivity failure.  
-Ideally, you can prevent these problems by enabling jumbo frames on the physical network that contains your tenant virtual networks. Jumbo frames support MTUs up to approximately 9000 bytes which negates the impact of GRE overhead on virtual networks. However, many network devices lack support for jumbo frames and OpenStack administrators often lack control over network infrastructure. Given the latter complications, you can also prevent MTU problems by reducing the instance MTU to account for GRE overhead. Determining the proper MTU value often takes experimentation, but 1454 bytes works in most environments. You can configure the DHCP server that assigns IP addresses to your instances to also adjust the MTU.  
-**Note:** Some cloud images ignore the DHCP MTU option in which case you should configure it using metadata, script, or other suitable method.  
-      1. Modify `/etc/neutron/dhcp_agent.ini` to enable the dnsmask configuration file:
-    
-        ```
-        [DEFAULT]
-        ...
-        dnsmasq_config_file = /etc/neutron/dnsmasq-neutron.conf
-        ```
-      2. Create and edit `/etc/neutron/dhcp_agent.ini` to enable the DHCP MTU option (26) and configure it to 1454 bytes:  
-      `dhcp-option-force=26,1454`
-      3. Kill any existing dnsmask processes:  
-        `pkill dnsmask`
+    ```
+    [DEFAULT]
+    ...
+    interface_driver = neutron.agent.linux.interface.OVSInterfaceDriver
+    dhcp_driver = neutron.agent.linux.dhcp.Dnsmasq
+    use_namespaces = True
+    ```
+  2. Set the logging to verbose for troubleshooting purpose (optional):
+
+    ```
+    [DEFAULT]
+    ...
+    verbose = True
+    ```
 5. Configure the metadata agent.
   1. Modify `/etc/neutron/metadata_agent.ini` to:
     1. Configure access parameters:
@@ -375,7 +359,7 @@ Ideally, you can prevent these problems by enabling jumbo frames on the physical
       ...
       verbose = True
       ```
-  2. Modify `/etc/nova/nova.conf` to enable the metadata proxy and configure the secret:
+  2. Modify `/etc/nova/nova.conf` **on the core VM** to enable the metadata proxy and configure the secret:
   
     ```
     [DEFAULT]
@@ -384,9 +368,10 @@ Ideally, you can prevent these problems by enabling jumbo frames on the physical
     neutron_metadata_proxy_shared_secret = METADATA_SECRET
     ```  
     Replacing _METADATA_SECRET_ with the secret you chose for the metadata proxy.
-  3. Restart the Compute API service:  
+  3. Restart the Compute API service **on the core VM**:  
     `service nova-api restart`
 6. Configure the ML2 plug-in. Modification applied in `/etc/neutron/plugins/ml2/ml2_conf.ini`:
+
     ```
     [ml2]
     ...
