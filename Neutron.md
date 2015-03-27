@@ -404,23 +404,23 @@ Configure some kernel networking parameters:
     `service openvswitch-switch restart`
   2. Add the external bridge:  
     `ovs-vsctl add-br br-ex`
-  3. Add a port connecting this bridge to the interface of the VM and change the configuration accordingly (connectivity is going to be lost, so make sure your are not dependent on it. Or run all the following command at once in a script):
-  
+  3. Add a port connecting this bridge to the interface of the Networking node and change the configuration accordingly (connectivity is going to be lost, so make sure your are not dependent on it. Or run all the following command at once in a script):
+
     ```
-    ovs-vsctl add-port br-ex eth0
-    ifconfig eth0 0.0.0.0
-    ifconfig br-ex 10.89.201.1 netmask 255.255.0.0
+    ovs-vsctl add-port br-ex em1
+    ifconfig em1 0.0.0.0
+    ifconfig br-ex 10.89.200.2 netmask 255.255.0.0
     route add default gw 10.89.0.1 br-ex
-    ifconfig eth1 down
-    ifconfig eth1 up
+    ifconfig em2 down
+    ifconfig em2 up
     ```
   4. Create the internal bridge:  
-    `ovs-vsctl add-br br-eth1`
+    `ovs-vsctl add-br br-int`
   5. Add a port connecting this bridge to the interface of the VM and change the configuration accordingly:  
     ```
-    ovs-vsctl add-port br-eth1 eth1
-    ifconfig eth1 0.0.0.0
-    ifconfig br-eth1 10.89.211.1 netmask 255.255.0.0
+    ovs-vsctl add-port br-in em2
+    ifconfig em2 0.0.0.0
+    ifconfig br-int 10.89.210.2 netmask 255.255.0.0
     ```
   6. Modify `/etc/network/interfaces` to make these changes permanent:  
     ```
@@ -432,34 +432,34 @@ Configure some kernel networking parameters:
     iface lo inet loopback
 
     # The primary network interface
-    auto eth0
-    iface eth0 inet static
-      up ifconfig eth0 0.0.0.0 up
-      up ip link set eth0 promisc on
-      down ip link set eth0 promisc off
-      down ifconfig eth0 down
+    auto em1
+    iface em1 inet static
+      up ifconfig em1 0.0.0.0 up
+      up ip link set em1 promisc on
+      down ip link set em1 promisc off
+      down ifconfig em1 down
 
-    auto eth1
-    iface eth1 inet static
-      up ifconfig eth1 0.0.0.0 up
-      up ip link set eth1 promisc on
-      down ip link set eth1 promisc off
-      down ifconfig eth1 down
+    auto em2
+    iface em2 inet static
+      up ifconfig em2 0.0.0.0 up
+      up ip link set em2 promisc on
+      down ip link set em2 promisc off
+      down ifconfig em2 down
 
     auto br-ex
     iface br-ex inet static
-      bridge_ports eth0
-      address 10.89.201.1
+      bridge_ports em1
+      address 10.89.210.2
       netmask 255.255.0.0
       broadcast 10.89.255.255
       gateway 10.89.0.1
       dns-nameservers 10.28.0.4 10.28.0.5
       dns-search uni.lux
 
-    auto br-eth1
-    iface br-eth1 inet static
-      bridge_ports eth1
-      address 10.89.211.1
+    auto br-int
+    iface br-int inet static
+      bridge_ports em2
+      address 10.89.210.2
       netmask 255.255.0.0
       broadcast 10.89.255.255
     ```
