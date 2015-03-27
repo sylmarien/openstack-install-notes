@@ -416,7 +416,8 @@ Configure some kernel networking parameters:
     ```
   4. Create the internal bridge:  
     `ovs-vsctl add-br br-int`
-  5. Add a port connecting this bridge to the interface of the VM and change the configuration accordingly:  
+  5. Add a port connecting this bridge to the interface of the VM and change the configuration accordingly:
+  
     ```
     ovs-vsctl add-port br-in em2
     ifconfig em2 0.0.0.0
