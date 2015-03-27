@@ -398,13 +398,14 @@ Configure some kernel networking parameters:
     tunnel_type = flat
     enable_tunneling = True
     ```  
-    Replacing _INSTANCE_TUNNELS_INTERFACE_IP_ADDRESS_ with the IP address of the instance tunnels network interface of the core VM. (Interface that is in the floating IPs network)
+    Replacing _INSTANCE_TUNNELS_INTERFACE_IP_ADDRESS_ with the IP address of the instance tunnels network interface of the Networking node. (IP address on the data network)
 7. Configure the Open vSwitch (OVS) service.  
   1. Restart the OVS service:  
     `service openvswitch-switch restart`
   2. Add the external bridge:  
     `ovs-vsctl add-br br-ex`
-  3. Add a port connecting this bridge to the interface of the VM and change the configuration accordingly (connectivity is going to be lost, so make sure your are not dependent on it. Or run all the following command at once in a script):  
+  3. Add a port connecting this bridge to the interface of the VM and change the configuration accordingly (connectivity is going to be lost, so make sure your are not dependent on it. Or run all the following command at once in a script):
+  
     ```
     ovs-vsctl add-port br-ex eth0
     ifconfig eth0 0.0.0.0
