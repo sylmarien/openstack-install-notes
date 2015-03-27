@@ -20,11 +20,14 @@ http://docs.openstack.org/juno/install-guide/install/apt/content/neutron-control
 **Core VM:**
 - neutron-server
 - neutron-plugin-ml2
-- python-neutronclient
+- python-neutronclient ?
+- python-mysqldb ?
+
+**Network node:**
+- neutron-plugin-ml2
 - neutron-plugin-openvswitch-agent
 - neutron-l3-agent
 - neutron-dhcp-agent
-- python-mysqldb
 
 **Compute node:**
 - neutron-plugin-ml2
@@ -71,7 +74,7 @@ Before installing and configure Neutron, we must create a database and Identity 
 1. Install the packages:
 
   ```
-  apt-get install neutron-server neutron-plugin-ml2 neutron-plugin-ml2 neutron-plugin-openvswitch-agent neutron-l3-agent neutron-dhcp-agent
+  apt-get install neutron-server neutron-plugin-ml2 
   ```
 2. Modify `/etc/neutron/neutron.conf` to:
   1. Configure database access:
@@ -192,14 +195,6 @@ Before installing and configure Neutron, we must create a database and Identity 
     firewall_driver = neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
     enable_security_group = True
     ```
-    ```
-    [ovs]
-    ...
-    local_ip = INSTANCE_TUNNELS_INTERFACE_IP_ADDRESS
-    tunnel_type = flat
-    enable_tunneling = True
-    ```  
-    Replacing _INSTANCE_TUNNELS_INTERFACE_IP_ADDRESS_ with the IP address of the instance tunnels network interface of the core VM. (Interface that is in the floating IPs network)
 5. Restart the Compute services:
 
   ```
@@ -223,17 +218,79 @@ Before installing and configure Neutron, we must create a database and Identity 
       su -s /bin/sh -c "neutron-db-manage --config-file /etc/neutron/neutron.conf --config-file /etc/neutron/plugins/ml2/ml2_conf.ini upgrade icehouse" neutron
       ```
     3. Attempt to start the _neutron-server_ service again. You can return the _core_plugin_ and _service_plugins_ configuration keys to short plug-in names.
-7. Configure some kernel networking parameters:
+
+#### Network node install
+
+**Prerequisites:**  
+Configure some kernel networking parameters:
   1. Modify `/etc/sysctl.conf` to add the following parameters:
 
     ```
     net.ipv4.ip_forward=1
     net.ipv4.conf.all.rp_filter=0
     net.ipv4.conf.default.rp_filter=0
+    net.bridge.bridge-nf-call-arptables=1
+    net.bridge.bridge-nf-call-iptables=1
+    net.bridge.bridge-nf-call-ip6tables=1
     ```
   2. Implement changes:  
     `sysctl -p`
-8. Configure the Layer-3 (L3) agent. Modify `/etc/neutron/l3_agent.ini` to:
+
+**Installation and configuration**
+
+1. Install packages:
+
+    ```
+    apt-get install neutron-plugin-ml2 neutron-plugin-openvswitch-agent neutron-l3-agent neutron-dhcp-agent
+    ```
+2. Configure Neutron common components. Modifications are applied in `/etc/neutron/neutron.conf`:
+  1. Configure Neutron to use the Identity service for authentication:
+
+      ```
+      [DEFAULT]
+      ...
+      auth_strategy = keystone
+      ```
+      ```
+      [keystone_authtoken]
+      ...
+      auth_uri = http://core:5000
+      auth_host = core
+      auth_protocol = http
+      auth_port = 35357
+      admin_tenant_name = service
+      admin_user = neutron
+      admin_password = NEUTRON_PASS
+      ```
+      Where _NEUTRON_PASS_ is the paswword you chose for the _neutron_ user in the Identity service.
+    2. Configure Neutron to use the message broker:
+
+      ```
+      [DEFAULT]
+      ...
+      rpc_backend = neutron.openstack.common.rpc.impl_kombu
+      rabbit_host = core
+      rabbit_userid = guest
+      rabbit_password = RABBIT_PASS
+      ```
+      Where _RABBIT_PASS_ is the password you chose for the guest user in RabbitMQ.
+    3. Configure Neutron to use the ML2 plug-in and associated services:
+
+      ```
+      [DEFAULT]
+      ...
+      core_plugin = ml2
+      service_plugins = router
+      allow_overlapping_ips = True
+      ```
+    4. Set the logging to verbose for troubleshooting purpose (optional):
+
+        ```
+        [DEFAULT]
+        ...
+        verbose = True
+        ```
+3. Configure the Layer-3 (L3) agent. Modify `/etc/neutron/l3_agent.ini` to:
   1. Configure the driver, enable network namespaces:
   
     ```
@@ -249,7 +306,7 @@ Before installing and configure Neutron, we must create a database and Identity 
     ...
     verbose = True
     ```
-9. Configure the DHCP agent.
+4. Configure the DHCP agent.
   1. Modify `/etc/neutron/dhcp_agent.ini` to:
     1. Configure the drivers and enable namespaces:
     
@@ -282,7 +339,7 @@ Ideally, you can prevent these problems by enabling jumbo frames on the physical
       `dhcp-option-force=26,1454`
       3. Kill any existing dnsmask processes:  
         `pkill dnsmask`
-10. Configure the metadata agent.
+5. Configure the metadata agent.
   1. Modify `/etc/neutron/metadata_agent.ini` to:
     1. Configure access parameters:
     
@@ -329,7 +386,35 @@ Ideally, you can prevent these problems by enabling jumbo frames on the physical
     Replacing _METADATA_SECRET_ with the secret you chose for the metadata proxy.
   3. Restart the Compute API service:  
     `service nova-api restart`
-11. Configure the Open vSwitch (OVS) service.  
+6. Configure the ML2 plug-in. Modification applied in `/etc/neutron/plugins/ml2/ml2_conf.ini`:
+    ```
+    [ml2]
+    ...
+    type_drivers = flat
+    tenant_network_types = flat
+    mechanism_drivers = openvswitch
+    ```
+    ```
+    [ml2_type_flat]
+    ...
+    flat_networks = prod,data
+    ```
+    That means that our network will be able to be create on physical networks named `prod` or `data`. Nothing else.
+    ```
+    [securitygroup]
+    ...
+    firewall_driver = neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
+    enable_security_group = True
+    ```
+    ```
+    [ovs]
+    ...
+    local_ip = INSTANCE_TUNNELS_INTERFACE_IP_ADDRESS
+    tunnel_type = flat
+    enable_tunneling = True
+    ```  
+    Replacing _INSTANCE_TUNNELS_INTERFACE_IP_ADDRESS_ with the IP address of the instance tunnels network interface of the core VM. (Interface that is in the floating IPs network)
+7. Configure the Open vSwitch (OVS) service.  
   1. Restart the OVS service:  
     `service openvswitch-switch restart`
   2. Add the external bridge:  
@@ -394,7 +479,7 @@ Ideally, you can prevent these problems by enabling jumbo frames on the physical
     ```
   7. Restart the VM to apply all changes.
     `sudo reboot`
-12. Restart the Networking services (not needed if the reboot has been done):
+8. Restart the Networking services (not needed if the reboot has been done):
 
   ```
   service neutron-plugin-openvswitch-agent restart
