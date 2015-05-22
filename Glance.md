@@ -5,7 +5,7 @@
 This file contains notes on the install procedure for the Glance module of OpenStack.  
 ***Important note: This document currently describe a very generic configuration, it should be adapted to describe the configuration that we will actually deploy. (Will be done as soon as we know more about this configuration)***
 
-## Install on the Controller node
+## Install on the store node
 
 As of now, I follow the instructions of the documentation at this page:  
 [Glance Install in the OpenStack documentation](http://docs.openstack.org/juno/install-guide/install/apt/content/image-service-overview.html)
@@ -44,7 +44,7 @@ Before you install and configure the Image Service, you must create a database a
 4. Create the Identity service endpoint **on the Core VM**:
 
     ```
-    keystone endpoint-create --service-id $(keystone service-list | awk '/ image / {print $2}') --publicurl http://store:9292 --internalurl http://store:9292 --adminurl http://store:9292 --region regionOne
+    keystone endpoint-create --service-id $(keystone service-list | awk '/ image / {print $2}') --publicurl http://pyro-store:9292 --internalurl http://pyro-store:9292 --adminurl http://pyro-store:9292 --region regionOne
     ```
     
 **Install and configure the Image Service (Glance) components**
@@ -57,7 +57,7 @@ Before you install and configure the Image Service, you must create a database a
         ```
         [database]
         ...
-        connection = mysql://glance:GLANCE_DBPASS@database/glance
+        connection = mysql://glance:GLANCE_DBPASS@pyro-database/glance
         ```
     Replacing _GLANCE_DBPASS_ with the password you chose for the Image Service database.
     2. Configure Identity service access:
@@ -65,8 +65,8 @@ Before you install and configure the Image Service, you must create a database a
         ```
         [keystone_authtoken]
         ...
-        auth_uri = http://core:5000
-        auth_host = core
+        auth_uri = http://pyro-core:5000
+        auth_host = pyro-core
         auth_port = 35357
         auth_protocol = http
         admin_tenant_name = service
@@ -91,7 +91,7 @@ Before you install and configure the Image Service, you must create a database a
     4. Change RabbitMQ configuration:
 
         ```
-        rabbit_host = core
+        rabbit_host = pyro-core
         rabbit_password = RABBIT_PASSWORD
         ```
         Where `RABBIT_PASSWORD` is the password for the RaabitMQ guest account.
@@ -108,7 +108,7 @@ Before you install and configure the Image Service, you must create a database a
         ```
         [database]
         ...
-        connection = mysql://glance:GLANCE_DBPASS@database/glance
+        connection = mysql://glance:GLANCE_DBPASS@pyro-database/glance
         ```  
         Replacing _GLANCE_DBPASS_ with the password you chose for the Image Service database.
     2. Configure the Identity service access:
@@ -116,8 +116,8 @@ Before you install and configure the Image Service, you must create a database a
         ```
         [keystone_authtoken]
         ...
-        auth_uri = http://core:5000
-        auth_host = core
+        auth_uri = http://pyro-core:5000
+        auth_host = pyro-core
         auth_port = 35357
         auth_protocol = http
         admin_tenant_name = service

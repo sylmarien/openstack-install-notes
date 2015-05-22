@@ -15,7 +15,7 @@ The network configuration for these nodes is the following:
 
 **Configure networking**
 
-1. Content of `/etc//network/interfaces` should look like:
+1. Content of `/etc/network/interfaces` should look like:
   
     ```
 # The loopback network interface
@@ -23,14 +23,9 @@ auto lo
 iface lo inet loopback
 
 auto em1
-iface em1 inet manual
-  up ifconfig em1 0.0.0.0 up
-  up ip link set em1 promisc on
-  down ip link set em1 promisc off
-  down ifconfig em1 down
-
-auto br-eth1
-iface br-eth1 inet static
+iface em1 inet static
+  post-up ifconfig p2p1 down
+  post-up ifconfig p2p1 up
   address 10.89.200.11
   netmask 255.255.0.0
   broadcast 10.89.255.255
@@ -38,38 +33,42 @@ iface br-eth1 inet static
   dns-nameservers 10.28.0.4 10.28.0.5
   dns-search uni.lux
 
-auto em2
-iface em2 inet static
+auto p2p1
+iface p2p1 inet static
   address 10.89.210.11
-  netmask 255.255.255.0
-  broadcast 10.89.210.255
+  netmask 255.255.0.0
+  broadcast 10.89.255.255
+  mtu 9000
     ```
 2. Modify /etc/hosts to configure the name resolution:
 
   ```
-127.0.0.1 localhost
+127.0.0.1       localhost
 
 # Controller nodes
-10.89.200.1       openstack-ctrl1
-10.89.200.2       openstack-ctrl2
+10.89.200.1       pyro-ctrl1
+10.89.200.2       pyro-ctrl2
 
 # Compute nodes
-10.89.200.11      openstack-comp1
-10.89.200.12      openstack-comp2
-10.89.200.13      openstack-comp3
-10.89.200.14      openstack-comp4
+10.89.200.11      pyro-comp1
+10.89.200.12      pyro-comp2
+10.89.200.13      pyro-comp3
+10.89.200.14      pyro-comp4
+
+# Storage node (NetApp front-end)
+10.89.200.200     pyro-storage
 
 # Horizon
-10.89.201.2       horizon
+10.89.201.2       pyro-horizon
 
 # Core
-10.89.201.1       core
+10.89.201.1       pyro-core
 
 # Store
-10.89.201.3       store
+10.89.201.3       pyro-store
 
 # Database
-10.89.201.4       database
+10.89.201.4       pyro-database
   ```
 3. Reboot to activate changes.
 
@@ -82,7 +81,7 @@ iface em2 inet static
 
       ```
       # OpenStack architecture reference
-      server openstack-ctrl1 iburst dynamic
+      server pyro-ctrl1 iburst dynamic
       ```
   2. Remove the `/var/lib/ntp/ntp.conf.dhcp` file if it exists.
 3. Restart the NTP service:  

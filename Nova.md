@@ -59,7 +59,7 @@ Go to:
 4. Create the Compute service endpoints **on the core VM**:
 
     ```
-    keystone endpoint-create --service-id $(keystone service-list | awk '/ compute / {print $2}') --publicurl http://core:8774/v2/%\(tenant_id\)s --internalurl http://core:8774/v2/%\(tenant_id\)s --adminurl http://core:8774/v2/%\(tenant_id\)s --region regionOne
+    keystone endpoint-create --service-id $(keystone service-list | awk '/ compute / {print $2}') --publicurl http://pyro-core:8774/v2/%\(tenant_id\)s --internalurl http://pyro-core:8774/v2/%\(tenant_id\)s --adminurl http://pyro-core:8774/v2/%\(tenant_id\)s --region regionOne
     ```
 
 **Installation and configuration of the Compute Controller component**
@@ -75,7 +75,7 @@ Go to:
         ```
         [database]
         ...
-        connection = mysql://nova:NOVA_DBPASS@database/nova
+        connection = mysql://nova:NOVA_DBPASS@pyro-database/nova
         ```
     Replacing _NOVA_DBPASS_ with the password you chose for the nova database.
     2. Configure RabbitMQ message broker access:
@@ -84,7 +84,7 @@ Go to:
         [DEFAULT]  
         ...
         rpc_backend = rabbit
-        rabbit_host = core
+        rabbit_host = pyro-core
         rabbit_userid = guest
         rabbit_password = RABBIT_PASS
         ```
@@ -99,8 +99,8 @@ Go to:
         ```
         [keystone_authtoken]
         ...
-        auth_uri = http://core:5000
-        auth_host = core
+        auth_uri = http://pyro-core:5000
+        auth_host = pyro-core
         auth_port = 35357
         auth_protocol = http
         admin_tenant_name = service
@@ -123,7 +123,7 @@ Go to:
         ```
         [DEFAULT]
         ...
-        glance_host = store
+        glance_host = pyro-store
         ```
     6. Set the logging to verbose for troubleshooting purpose (optional):
     
@@ -158,7 +158,7 @@ Go to:
         [DEFAULT]
         ...
         rpc_backend = rabbit
-        rabbit_host = core
+        rabbit_host = pyro-core
         rabbit_userid = guest
         rabbit_password = RABBIT_PASS
         ```
@@ -172,14 +172,14 @@ Go to:
         ```
         ```
         [database]
-        connection = mysql://nova:NOVA_DBPASS@database/nova
+        connection = mysql://nova:NOVA_DBPASS@pyro-database/nova
         ```
         Replacing _NOVA_DBPASS_ with the password you chose for the nova database.  
         ```
         [keystone_authtoken]
         ...
-        auth_uri = http://core:5000
-        auth_host = core
+        auth_uri = http://pyro-core:5000
+        auth_host = pyro-core
         auth_port = 35357
         auth_protocol = http
         admin_tenant_name = service
@@ -203,7 +203,7 @@ Go to:
         vnc_enabled = True
         vncserver_listen = 0.0.0.0
         vncserver_proxyclient_address = MANAGEMENT_INTERFACE_IP_ADDRESS
-        novncproxy_base_url = http://core:6080/vnc_auto.html
+        novncproxy_base_url = http://pyro-core:6080/vnc_auto.html
         ```
     The server component listens on all IP addresses and the proxy component only listens on the management interface IP address of the compute node. The base URL indicates the location where you can use a web browser to access remote consoles of instances on this compute node.  
     Replacing _MANAGEMENT_INTERFACE_IP_ADDRESS_ with the IP address of the management interface of the compute node. (In this example 10.89.200.11->14)
@@ -212,7 +212,7 @@ Go to:
         ```
         [DEFAULT]
         ...
-        glance_host = store
+        glance_host = pyro-store
         ```
     6. Set the logging to verbose for troubleshooting purpose (optional):
     

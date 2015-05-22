@@ -20,8 +20,8 @@ http://docs.openstack.org/juno/install-guide/install/apt/content/neutron-control
 **Core VM:**
 - neutron-server
 - neutron-plugin-ml2
-- python-neutronclient ?
-- python-mysqldb ?
+- python-neutronclient
+- python-mysqldb
 
 **Network node:**
 - neutron-plugin-ml2
@@ -66,7 +66,7 @@ Before installing and configure Neutron, we must create a database and Identity 
   4. Create the Identity service endpoints:
   
     ```
-    keystone endpoint-create --service-id $(keystone service-list | awk '/ network / {print $2}') --publicurl http://core:9696 --adminurl http://core:9696 --internalurl http://core:9696 --region regionOne
+    keystone endpoint-create --service-id $(keystone service-list | awk '/ network / {print $2}') --publicurl http://pyro-core:9696 --adminurl http://pyro-core:9696 --internalurl http://pyro-core:9696 --region regionOne
     ```
 
 **Installation and configuration of the Network components**
@@ -82,7 +82,7 @@ Before installing and configure Neutron, we must create a database and Identity 
     ```
     [database]
     ...
-    connection = mysql://neutron:NEUTRON_DBPASS@database/neutron
+    connection = mysql://neutron:NEUTRON_DBPASS@pyro-database/neutron
     ```  
     Replacing _NEUTRON_DBPASS_ with the password you chose for the database.
   2. Configure RabbitMQ message broker access:
@@ -91,7 +91,7 @@ Before installing and configure Neutron, we must create a database and Identity 
     [DEFAULT]
     ...
     rpc_backend = neutron.openstack.common.rpc.impl_kombu
-    rabbit_host = core
+    rabbit_host = pyro-core
     rabbit_userid = guest
     rabbit_password = RABBIT_PASS
     ```  
@@ -106,8 +106,8 @@ Before installing and configure Neutron, we must create a database and Identity 
     ```
     [keystone_authtoken]
     ...
-    auth_uri = http://core:5000
-    auth_host = core
+    auth_uri = http://pyro-core:5000
+    auth_host = pyro-core
     auth_port = 35357
     auth_protocol = http
     admin_tenant_name = service
@@ -131,8 +131,8 @@ Before installing and configure Neutron, we must create a database and Identity 
     ...
     notify_nova_on_port_status_changes = True
     notify_nova_on_port_data_changes = True
-    nova_url = http://core:8774/v2
-    nova_admin_auth_url = http://core:35357/v2.0
+    nova_url = http://pyro-core:8774/v2
+    nova_admin_auth_url = http://pyro-core:35357/v2.0
     nova_region_name = regionOne
     nova_admin_username = nova
     nova_admin_tenant_id = SERVICE_TENANT_ID
@@ -166,9 +166,9 @@ Before installing and configure Neutron, we must create a database and Identity 
     ```
     [DEFAULT]
     ...
-    neutron_url = http://core:9696
+    neutron_url = http://pyro-core:9696
     neutron_auth_strategy = keystone
-    neutron_admin_auth_url = http://core:35357/v2.0
+    neutron_admin_auth_url = http://pyro-core:35357/v2.0
     neutron_admin_tenant_name = service
     neutron_admin_username = neutron
     neutron_admin_password = NEUTRON_PASS
@@ -179,21 +179,22 @@ Before installing and configure Neutron, we must create a database and Identity 
     ```
     [ml2]
     ...
-    type_drivers = flat
-    tenant_network_types = flat
+    type_drivers = flat,gre
+    tenant_network_types = gre
     mechanism_drivers = openvswitch
     ```
     ```
-    [ml2_type_flat]
+    [ml2_type_gre]
     ...
-    flat_networks = prod,data
+    tunnel_id_ranges = 1:1000
     ```
     That means that our network will be able to be create on physical networks named `prod` or `data`. Nothing else.
     ```
     [securitygroup]
     ...
-    firewall_driver = neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
     enable_security_group = True
+    enable_ipset = True
+    firewall_driver = neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
     ```
 5. Restart the Compute services:
 
@@ -229,12 +230,45 @@ Configure some kernel networking parameters:
     net.ipv4.ip_forward=1
     net.ipv4.conf.all.rp_filter=0
     net.ipv4.conf.default.rp_filter=0
-    net.bridge.bridge-nf-call-arptables=1
-    net.bridge.bridge-nf-call-iptables=1
-    net.bridge.bridge-nf-call-ip6tables=1
     ```
   2. Implement changes:  
     `sysctl -p`
+
+Network settings. Modify `/etc/network/interfaces`:
+
+```
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+# The primary network interface
+auto em1
+iface em1 inet static
+  post-up ifconfig p2p1 down
+  post-up ifconfig p2p1 up
+  post-up ifconfig p2p2 down
+  post-up ifconfig p2p2 up
+  address 10.89.200.2
+  netmask 255.255.0.0
+  broadcast 10.89.255.255
+  gateway 10.89.0.1
+  dns-nameservers 10.28.0.4 10.28.0.5
+  dns-search uni.lux
+
+auto p2p1
+iface p2p1 inet static
+  address 10.89.210.2
+  netmask 255.255.0.0
+  broadcast 10.89.255.255
+  mtu 9000
+
+auto p2p2
+iface p2p2 inet manual
+  up ip link set dev $IFACE up
+  up ip link set $IFACE promisc on
+  down ip link set $IFACE promisc off
+  down ip link set dev $IFACE down
+```
 
 **Installation and configuration**
 
@@ -254,8 +288,8 @@ Configure some kernel networking parameters:
       ```
       [keystone_authtoken]
       ...
-      auth_uri = http://core:5000
-      auth_host = core
+      auth_uri = http://pyro-core:5000
+      auth_host = pyro-core
       auth_protocol = http
       auth_port = 35357
       admin_tenant_name = service
@@ -269,7 +303,7 @@ Configure some kernel networking parameters:
       [DEFAULT]
       ...
       rpc_backend = neutron.openstack.common.rpc.impl_kombu
-      rabbit_host = core
+      rabbit_host = pyro-core
       rabbit_userid = guest
       rabbit_password = RABBIT_PASS
       ```
@@ -298,6 +332,8 @@ Configure some kernel networking parameters:
     ...
     interface_driver = neutron.agent.linux.interface.OVSInterfaceDriver
     use_namespaces = True
+    external_network_bridge = br-ex
+    router_delete_namespaces = True
     ```
   2. Set the logging to verbose for troubleshooting purpose (optional):
   
@@ -315,14 +351,31 @@ Configure some kernel networking parameters:
     interface_driver = neutron.agent.linux.interface.OVSInterfaceDriver
     dhcp_driver = neutron.agent.linux.dhcp.Dnsmasq
     use_namespaces = True
+    dhcp_delete_namespaces = True
     ```
-  2. Set the logging to verbose for troubleshooting purpose (optional):
+  2. Set the dnsmasq configuration file:
+
+    ```
+    [DEFAULT]
+    ...
+    dnsmasq_config_file = /etc/neutron/dnsmasq-neutron.conf
+    ```
+  3. Set the logging to verbose for troubleshooting purpose (optional):
 
     ```
     [DEFAULT]
     ...
     verbose = True
     ```
+  4. Modify `/etc/neutron/dnsmasq-neutron.conf`:
+
+    ```
+    dhcp-option-force=26,1400
+    no-resolv
+    server=/10.28.0.4/10.28.0.5
+    ```
+  5. Kill any existing dnsmasq process:  
+    `pkill dnsmasq`
 5. Configure the metadata agent.
   1. Modify `/etc/neutron/metadata_agent.ini` to:
     1. Configure access parameters:
@@ -330,7 +383,7 @@ Configure some kernel networking parameters:
       ```
       [DEFAULT]
       ...
-      auth_url = http://core:5000/v2.0
+      auth_url = http://pyro-core:5000/v2.0
       auth_region = regionOne
       admin_tenant_name = service
       admin_user = neutron
@@ -342,8 +395,9 @@ Configure some kernel networking parameters:
       ```
       [DEFAULT]
       ...
-      nova_metadata_ip = core
+      nova_metadata_ip = CORE_IP
       ```
+      Where _CORE_IP_ is the IP address of the Core VM (10.89.201.1). **It has to be the actual IP, not a name to be resolved.**
     3. Configure the metadata proxy shared secret:
     
       ```
@@ -375,97 +429,48 @@ Configure some kernel networking parameters:
     ```
     [ml2]
     ...
-    type_drivers = flat
-    tenant_network_types = flat
+    type_drivers = flat,gre
+    tenant_network_types = gre
     mechanism_drivers = openvswitch
     ```
     ```
     [ml2_type_flat]
     ...
-    flat_networks = prod,data
+    flat_networks = external
     ```
-    That means that our network will be able to be create on physical networks named `prod` or `data`. Nothing else.
+    That means that our network will be able to be create on physical networks named `external`. Nothing else.
+    ```
+    [ml2_type_gre]
+    ...
+    tunnel_id_ranges = 1:1000
+    ```
     ```
     [securitygroup]
     ...
-    firewall_driver = neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
     enable_security_group = True
+    enable_ipset = True
+    firewall_driver = neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
     ```
     ```
     [ovs]
     ...
     local_ip = INSTANCE_TUNNELS_INTERFACE_IP_ADDRESS
-    tunnel_type = flat
     enable_tunneling = True
+    bridge_mappings = external:br-ex
     ```  
     Replacing _INSTANCE_TUNNELS_INTERFACE_IP_ADDRESS_ with the IP address of the instance tunnels network interface of the Networking node. (IP address on the data network)
+    ```
+    [agent]
+    ...
+    tunnel_types = gre
+    ```
 7. Configure the Open vSwitch (OVS) service.  
   1. Restart the OVS service:  
     `service openvswitch-switch restart`
   2. Add the external bridge:  
     `ovs-vsctl add-br br-ex`
-  3. Add a port connecting this bridge to the interface of the Networking node and change the configuration accordingly (connectivity is going to be lost, so make sure your are not dependent on it. Or run all the following command at once in a script):
-
-    ```
-    ovs-vsctl add-port br-ex em1
-    ifconfig em1 0.0.0.0
-    ifconfig br-ex 10.89.200.2 netmask 255.255.0.0
-    route add default gw 10.89.0.1 br-ex
-    ifconfig em2 down
-    ifconfig em2 up
-    ```
-  4. Create the internal bridge:  
-    `ovs-vsctl add-br br-int`
-  5. Add a port connecting this bridge to the interface of the VM and change the configuration accordingly:
-
-    ```
-    ovs-vsctl add-port br-int em2
-    ifconfig em2 0.0.0.0
-    ifconfig br-int 10.89.210.2 netmask 255.255.0.0
-    ```
-  6. Modify `/etc/network/interfaces` to make these changes permanent:  
-    ```
-    # This file describes the network interfaces available on your system
-    # and how to activate them. For more information, see interfaces(5).
-
-    # The loopback network interface
-    auto lo
-    iface lo inet loopback
-
-    # The primary network interface
-    auto em1
-    iface em1 inet static
-      up ifconfig em1 0.0.0.0 up
-      up ip link set em1 promisc on
-      down ip link set em1 promisc off
-      down ifconfig em1 down
-
-    auto em2
-    iface em2 inet static
-      up ifconfig em2 0.0.0.0 up
-      up ip link set em2 promisc on
-      down ip link set em2 promisc off
-      down ifconfig em2 down
-
-    auto br-ex
-    iface br-ex inet static
-      bridge_ports em1
-      address 10.89.210.2
-      netmask 255.255.0.0
-      broadcast 10.89.255.255
-      gateway 10.89.0.1
-      dns-nameservers 10.28.0.4 10.28.0.5
-      dns-search uni.lux
-
-    auto br-int
-    iface br-int inet static
-      bridge_ports em2
-      address 10.89.210.2
-      netmask 255.255.0.0
-      broadcast 10.89.255.255
-    ```
-  7. Restart the VM to apply all changes.
-    `sudo reboot`
+  3. Add a port connecting this bridge to the interface of the Networking node and change the configuration accordingly (connectivity is going to be lost, so make sure your are not dependent on it. Or run all the following command at once in a script):  
+    `ovs-vsctl add-port br-ex p2p2`
 8. Restart the Networking services (not needed if the reboot has been done):
 
   ```
@@ -501,7 +506,7 @@ Configure some kernel networking parameters:
     [DEFAULT]
     ...
     rpc_backend = neutron.openstack.common.rpc.impl_kombu
-    rabbit_host = core
+    rabbit_host = pyro-core
     rabbit_userid = guest
     rabbit_password = RABBIT_PASS
     ```  
@@ -516,8 +521,8 @@ Configure some kernel networking parameters:
     ```
     [keystone_authtoken]
     ...
-    auth_uri = http://core:5000/v2.0
-    auth_host = core
+    auth_uri = http://pyro-core:5000/v2.0
+    auth_host = pyro-core
     auth_port = 35357
     auth_protocol = http
     admin_tenant_name = service
@@ -547,16 +552,16 @@ Configure some kernel networking parameters:
     ```
     [ml2]
     ...
-    type_drivers = flat
-    tenant_network_types = flat
+    type_drivers = flat,gre
+    tenant_network_types = gre
     mechanism_drivers = openvswitch
     ```
-  2. Configure the flat network provider possible names:
+  2. Configure the tunnel identifier (id) range:
   
     ```
-    [ml2_type_flat]
+    [ml2_type_gre]
     ...
-    flat_networks = prod,data
+    tunnel_id_ranges = 1:1000
     ```
     That means that our network will be able to be create on physical networks named `prod` or `data`. Nothing else.
   3. Enable security groups and configure the OVS iptables firewall driver:
@@ -565,6 +570,7 @@ Configure some kernel networking parameters:
     [securitygroup]
     ...
     enable_security_group = True
+    enable_ipset = True
     firewall_driver = neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
     ```
   4. Configure the Open vSwitch (OVS) agent:
@@ -573,10 +579,16 @@ Configure some kernel networking parameters:
     [ovs]
     ...
     local_ip = INSTANCE_TUNNELS_INTERFACE_IP_ADDRESS
-    tunnel_type = flat
     enable_tunneling = True
     ```  
     Replacing _INSTANCE_TUNNELS_INTERFACE_IP_ADDRESS_ with the IP address of the instance tunnels network interface on your compute node. (Interface that is in the floating IPs network)
+  5. In the [agent] section, enable GRE tunnels:
+
+    ```
+    [agent]
+    ...
+    tunnel_types = gre
+    ```
 4. Configure the Open vSwitch (OVS) service.
   1.Restart the OVS service:  
     `service openvswitch-switch restart`
@@ -599,9 +611,9 @@ Configure some kernel networking parameters:
     ```
     [DEFAULT]
     ...
-    neutron_url = http://core:9696
+    neutron_url = http://pyro-core:9696
     neutron_auth_strategy = keystone
-    neutron_admin_auth_url = http://core:35357/v2.0
+    neutron_admin_auth_url = http://pyro-core:35357/v2.0
     neutron_admin_tenant_name = service
     neutron_admin_username = neutron
     neutron_admin_password = NEUTRON_PASS

@@ -23,7 +23,7 @@ http://docs.openstack.org/icehouse/install-guide/install/apt/content/install_das
   `apt-get remove --purge openstack-dashboard-ubuntu-theme`
 3. Modify `/etc/openstack-dashboard/local_settings.py` to:
   1. Define the hostname of the Identity service (in this example, controller):  
-    `OPENSTACK_HOST = "core"`
+    `OPENSTACK_HOST = "pyro-core"`
   2. Set the addresses from which you want to enable the access to the dashboard:  
     `ALLOWED_HOSTS = ['*']`  
     In a production environment, it would be intersting to allow only IP from the University maybe ? (what about home working ?). Note: if you want to specify multiple location, separate them with a `,` (example: `['localhost','workstation']` )

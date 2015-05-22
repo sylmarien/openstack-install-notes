@@ -13,27 +13,23 @@ Basic configuration is described in the [Controller.md](https://github.com/sylma
 
 Modify `/etc/network/interfaces` to match the following content:
 
-        # The loopback network interface
-        auto lo
-        iface lo inet loopback
-        
-        # The primary network interface
-        auto eth0
-        iface eth0 inet static
-            post-up ifconfig eth1 down
-            post-up ifconfig eth1 up
-            address 10.89.201.2
-            netmask 255.255.0.0
-            broadcast 10.89.255.255
-            gateway 10.89.0.1
-            dns-nameservers 10.28.0.4 10.28.0.5
-            dns-search uni.lux
-        
-        auto eth1
-        iface eth1 inet static
-            address 10.89.211.2
-            netmask 255.255.0.0
-            broadcast 10.89.255.255
+```
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+# The primary network interface
+auto eth0
+iface eth0 inet static
+    #post-up ifconfig eth1 down
+    #post-up ifconfig eth1 up
+    address 10.89.201.2
+    netmask 255.255.0.0
+    broadcast 10.89.255.255
+    gateway 10.89.0.1
+    dns-nameservers 10.28.0.4 10.28.0.5
+    dns-search uni.lux
+```
 
 **Basic prerequisites**
 

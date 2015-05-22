@@ -47,7 +47,7 @@ As of now, I follow the instructions of the documentation at this page:
         ```
         [database]
         ...
-        connection = mysql://keystone:KEYSTONE_DBPASS@database/keystone
+        connection = mysql://keystone:KEYSTONE_DBPASS@pyro-database/keystone
         ```
     where _KEYSTONE_DBPASS_ is the password for the database.
     3. Set the logging to verbose for troubleshooting purpose (optional):
@@ -76,7 +76,7 @@ As of now, I follow the instructions of the documentation at this page:
     `export OS_SERVICE_TOKEN=ADMIN_TOKEN`  
 where _ADMIN_TOKEN_ is the randomly generated number mentioned before.
 2. Configure the endpoint:  
-    `export OS_SERVICE_ENDPOINT=http://core:35357/v2.0`
+    `export OS_SERVICE_ENDPOINT=http://pyro-core:35357/v2.0`
 
 **Tenants, users and roles creation:**
 
@@ -120,7 +120,7 @@ OpenStack provides three API endpoint variations for each service: admin, intern
 2. Create the API endpoint for the Identity service (Keystone):
 
     ```
-    keystone endpoint-create --service-id $(keystone service-list | awk '/ identity / {print $2}') --publicurl http://core:5000/v2.0 --internalurl http://core:5000/v2.0 --adminurl http://core:35357/v2.0 --region regionOne
+    keystone endpoint-create --service-id $(keystone service-list | awk '/ identity / {print $2}') --publicurl http://pyro-core:5000/v2.0 --internalurl http://pyro-core:5000/v2.0 --adminurl http://pyro-core:35357/v2.0 --region regionOne
     ```
 
 **Client Environment scripts**
@@ -133,7 +133,7 @@ Admin script: in a file (named for example *admin-openrc.sh*) write the followin
 export OS_TENANT_NAME=admin
 export OS_USERNAME=admin
 export OS_PASSWORD=ADMIN_PASS
-export OS_AUTH_URL=http://core:35357/v2.0
+export OS_AUTH_URL=http://pyro-core:35357/v2.0
 ```  
 Replacing _ADMIN_PASS_ with your admin password.
 

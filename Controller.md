@@ -18,9 +18,9 @@ The system has been set up on an a disk managed through LVM with the following c
 The network configuration for this node is the following:  
 
 - em1: prod network (physical interface)
-- em2: data network (physical interface)
+- p2p1: data network (physical interface)
 - br0: virtual interface (bridge) used to connect all the VMs to em1
-- br1: virtual interface (brigde) used to connect all the VMs to em2
+- br1: virtual interface (brigde) used to connect all the VMs to p2p2 (Currently not used)
 
 **Configure networking**
 
@@ -34,19 +34,17 @@ iface lo inet loopback
 # em1 - prod network
 auto em1
 iface em1 inet manual
-        up ifconfig em1 0.0.0.0 up
-        up ip link set em1 promisc on
-        down ip link set em1 promisc off
-        down ifconfig em1 down
+  up ifconfig em1 0.0.0.0 up
+  up ip link set em1 promisc on
+  down ip link set em1 promisc off
+  down ifconfig em1 down
 
-# em2 - data network 
-auto em2
-iface em2 inet manual
-        up ifconfig em2 0.0.0.0 up
-        up ip link set em2 promisc on
-        down ip link set em2 promisc off
-        down ifconfig em2 down
-
+auto p2p1
+iface p2p1 inet manual
+  up ifconfig p2p1 0.0.0.0 up
+  up ip link set p2p1 promisc on
+  down ip link set p2p1 promisc off
+  down ifconfig p2p1 down
 
 # Bridges to set the service VMs in
 
@@ -65,7 +63,7 @@ iface br0 inet static
 
 auto br1
 iface br1 inet static
-  bridge_ports em2
+  bridge_ports p2p1
   bridge_stp      off
   bridge_maxwait  0
   bridge_fd       0
@@ -76,17 +74,32 @@ iface br1 inet static
 2. Modify /etc/hosts to configure the name resolution:
 
   ```
-127.0.0.1 localhost
+127.0.0.1       localhost
 
 # Controller nodes
-10.89.200.1       openstack-ctrl1
-10.89.200.2       openstack-ctrl2
+10.89.200.1       pyro-ctrl1
+10.89.200.2       pyro-ctrl2
 
 # Compute nodes
-10.89.200.11      openstack-comp1
-10.89.200.12      openstack-comp2
-10.89.200.13      openstack-comp3
-10.89.200.14      openstack-comp4
+10.89.200.11      pyro-comp1
+10.89.200.12      pyro-comp2
+10.89.200.13      pyro-comp3
+10.89.200.14      pyro-comp4
+
+# Storage node (NetApp front-end)
+10.89.200.200     pyro-storage
+
+# Horizon
+10.89.201.2       pyro-horizon
+
+# Core
+10.89.201.1       pyro-core
+
+# Store
+10.89.201.3       pyro-store
+
+# Database
+10.89.201.4       pyro-database
   ```
 3. Reboot to activate changes.
 
@@ -131,11 +144,11 @@ DNS:
 
 Gateway: 10.89.0.1
 
-openstack-ctrl1:
-Horizon : 10.89.201.2 (hostname: horizon, no domain name). user: localadmin mdp: localadmin
-Core: 10.89.201.1 (hostname: core, no domain name). user: localadmin mdp: localadmin
-Store: 10.89.201.3 (hostname: store, no domain name). user: localadmin mdp: localadmin
-Database: 10.89.201.4 (hostname: database, no domain name). user: localadmin mdp: localadmin
+pyro-ctrl1:
+Horizon : 10.89.201.2 (hostname: pyro-horizon, no domain name). user: localadmin mdp: localadmin
+Core: 10.89.201.1 (hostname: pyro-core, no domain name). user: localadmin mdp: localadmin
+Store: 10.89.201.3 (hostname: pyro-store, no domain name). user: localadmin mdp: localadmin
+Database: 10.89.201.4 (hostname: pyro-database, no domain name). user: localadmin mdp: localadmin
   ```
 6. Once the VM are running, before connecting to them, make sure to make them launch automatically when the server boots:
 
@@ -150,29 +163,32 @@ virsh autostart database
   `virsh console horizon`
   2. Modify `/etc/hosts` with the following changes:  
     ```
-127.0.0.1 localhost
+127.0.0.1       localhost
 
 # Controller nodes
-10.89.200.1       openstack-ctrl1
-10.89.200.2       openstack-ctrl2
+10.89.200.1       pyro-ctrl1
+10.89.200.2       pyro-ctrl2
 
 # Compute nodes
-10.89.200.11      openstack-comp1
-10.89.200.12      openstack-comp2
-10.89.200.13      openstack-comp3
-10.89.200.14      openstack-comp4
+10.89.200.11      pyro-comp1
+10.89.200.12      pyro-comp2
+10.89.200.13      pyro-comp3
+10.89.200.14      pyro-comp4
+
+# Storage node (NetApp front-end)
+10.89.200.200     pyro-storage
 
 # Horizon
-10.89.201.2       horizon
+10.89.201.2       pyro-horizon
 
 # Core
-10.89.201.1       core
+10.89.201.1       pyro-core
 
 # Store
-10.89.201.3       store
+10.89.201.3       pyro-store
 
 # Database
-10.89.201.4       database
+10.89.201.4       pyro-database
     ```
   3. Apply updates and install the ntp package as well as the mariadb-client package:  
   `apt-get update && apt-get dist-upgrade && apt-get install ntp mariadb-client`
@@ -180,7 +196,7 @@ virsh autostart database
     1. Modify `/etc/ntp.conf`, comment all server keys and add the following one:  
       ```
       # OpenStack architecture reference
-      server openstack-ctrl1 iburst dynamic
+      server pyro-ctrl1 iburst dynamic
       ```
     2. Remove the `/var/lib/ntp/ntp.conf.dhcp` file if it exists.
     3. Restart the NTP service: `service ntp restart`
