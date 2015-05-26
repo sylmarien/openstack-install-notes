@@ -43,10 +43,19 @@ http://docs.openstack.org/icehouse/install-guide/install/apt/content/install_das
   4. (Optionnal) Change the timezone (DON'T: currently, only working with UTC so far):  
     `TIME_ZONE = "UTC"`  
     To find you timezone, follow this [link](http://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
-4. Restart the services:
+4. Modify `/etc/apache2/conf-enabled/openstack-dashboard.conf` to redirect automatically to horizon:
+
+    ```
+    WSGIScriptAlias / /usr/share/openstack-dashboard/openstack_dashboard/wsgi/django.wsgi
+    ```
+    instead of
+    ```
+    WSGIScriptAlias /horizon /usr/share/openstack-dashboard/openstack_dashboard/wsgi/django.wsgi
+    ```
+5. Restart the services:
   
   ```
   service apache2 restart
   service memcached restart
   ```
-5. You know can access the dashboard at http://horizon/horizon (from a machine that can resolve the _horizon_ name) and login with any of the users you created in the Identity service.
+6. You know can access the dashboard at http://horizon (from a machine that can resolve the _horizon_ name) and login with any of the users you created in the Identity service.
