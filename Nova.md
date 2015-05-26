@@ -116,6 +116,8 @@ Go to:
         my_ip = MANAGEMENT_IP_ADDRESS
         vncserver_listen = MANAGEMENT_IP_ADDRESS
         vncserver_proxyclient_address = MANAGEMENT_IP_ADDRESS
+        novncproxy_port=8080
+        novncproxy_base_url = http://pyro-core:8080/vnc_auto.html
         ```  
         Replacing _MANAGEMENT_IP_ADDRESS_ with the IP address of the management interface. (10.89.201.1 in this temporary configuration).
     5. Configure the location of the Image service:
@@ -203,7 +205,8 @@ Go to:
         vnc_enabled = True
         vncserver_listen = 0.0.0.0
         vncserver_proxyclient_address = MANAGEMENT_INTERFACE_IP_ADDRESS
-        novncproxy_base_url = http://pyro-core:6080/vnc_auto.html
+        novncproxy_port=8080
+        novncproxy_base_url = http://pyro-core:8080/vnc_auto.html
         ```
     The server component listens on all IP addresses and the proxy component only listens on the management interface IP address of the compute node. The base URL indicates the location where you can use a web browser to access remote consoles of instances on this compute node.  
     Replacing _MANAGEMENT_INTERFACE_IP_ADDRESS_ with the IP address of the management interface of the compute node. (In this example 10.89.200.11->14)
