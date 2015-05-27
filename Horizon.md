@@ -43,6 +43,13 @@ http://docs.openstack.org/icehouse/install-guide/install/apt/content/install_das
   4. (Optionnal) Change the timezone (DON'T: currently, only working with UTC so far):  
     `TIME_ZONE = "UTC"`  
     To find you timezone, follow this [link](http://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
+  5. Modify the application root:
+
+    ```
+    LOGIN_URL='/auth/login/'
+    LOGOUT_URL='/auth/logout/'
+    LOGIN_REDIRECT_URL='/'
+    ```
 4. Modify `/etc/apache2/conf-enabled/openstack-dashboard.conf` to redirect automatically to horizon:
 
     ```
