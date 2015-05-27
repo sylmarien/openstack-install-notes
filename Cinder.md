@@ -16,6 +16,10 @@ Go to:
 
 ## NetApp configuration
 
+No details currently. Main points:
+- Create a storage pool that will be used by Cinder (we named it OpenStack_Pool1)
+- Remove the storage array password (bug in Cinder prevents from it from working with this password activated)
+
 ## Install on the store VM
 
 1. Install the packages:
