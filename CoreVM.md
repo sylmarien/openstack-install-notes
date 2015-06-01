@@ -10,7 +10,7 @@ Go to:
 
 ## Basic configuration
 
-Basic configuration is described in the [Controller.md](https://github.com/sylmarien/openstack-install-notes/blob/master/Controller.md) file. It is the shared configuration between all the VMs of the controller node.
+Basic configuration is described in the [Controller.md](Controller.md) file. It is the shared configuration between all the VMs of the controller node.
 
 **Network Configuration**
 
@@ -52,14 +52,14 @@ Then, we would have to configure the _rabbit_userid_ and _rabbit_password_ keys 
 
 ## Keystone Configuration
 
-Follow instructions at [keystone.md](https://github.com/sylmarien/openstack-install-notes/blob/master/Keystone.md).
+Follow instructions at [keystone.md](Keystone.md).
 
 ## Nova Configuration
 
 Please set up Glance before setting up Nova.
 
-Follow instructions at [Nova.md](https://github.com/sylmarien/openstack-install-notes/blob/master/Nova.md#core-vm-installation)
+Follow instructions at [Nova.md](Nova.md#core-vm-installation)
 
 ## Neutron Configuration
 
-Follow instructions at [Neutron.md](https://github.com/sylmarien/openstack-install-notes/blob/master/Neutron.md#core-vm-install)
+Follow instructions at [Neutron.md](Neutron.md#core-vm-install)

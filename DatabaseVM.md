@@ -5,7 +5,7 @@ This file contains notes on the Database VM of the architecture. Among others, t
 
 ## Basic configuration
 
-Basic configuration is described in the [Controller.md](https://github.com/sylmarien/openstack-install-notes/blob/master/Controller.md) file. It is the shared configuration between all the VMs of the controller node.
+Basic configuration is described in the [Controller.md](Controller.md) file. It is the shared configuration between all the VMs of the controller node.
 
 **Network Configuration**
 

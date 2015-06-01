@@ -101,4 +101,4 @@ Install the packages:
 
 ## Nova configuration
 
-Follow instructions at [Nova.md](https://github.com/sylmarien/openstack-install-notes/blob/master/Nova.md#compute-node-installation)
+Follow instructions at [Nova.md](Nova.md#compute-node-installation)

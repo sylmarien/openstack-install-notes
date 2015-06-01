@@ -5,7 +5,7 @@ This file contains notes on the Horizon VM of the architecture. Among others, th
 
 ## Basic configuration
 
-Basic configuration is described in the [Controller.md](https://github.com/sylmarien/openstack-install-notes/blob/master/Controller.md) file. It is the shared configuration between all the VMs of the controller node.
+Basic configuration is described in the [Controller.md](Controller.md) file. It is the shared configuration between all the VMs of the controller node.
 
 **Network Configuration**
 
@@ -39,4 +39,4 @@ iface eth0 inet static
 
 ## OpenStack Dashboard (Horizon) installation
 
-Follow the steps described in [Horizon.md](https://github.com/sylmarien/openstack-install-notes/blob/master/Horizon.md)
+Follow the steps described in [Horizon.md](Horizon.md)
