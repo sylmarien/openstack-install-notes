@@ -3,8 +3,6 @@
 ## Overview
 This file contains notes on the Controller node of the architecture.
 
-**During development, all passwords are _localadmin_.**
-
 ## Basic environment
 
 The system has been set up on an a disk managed through LVM with the following configuration:  
@@ -145,10 +143,10 @@ DNS:
 Gateway: 10.89.0.1
 
 pyro-ctrl1:
-Horizon : 10.89.201.2 (hostname: pyro-horizon, no domain name). user: localadmin mdp: localadmin
-Core: 10.89.201.1 (hostname: pyro-core, no domain name). user: localadmin mdp: localadmin
-Store: 10.89.201.3 (hostname: pyro-store, no domain name). user: localadmin mdp: localadmin
-Database: 10.89.201.4 (hostname: pyro-database, no domain name). user: localadmin mdp: localadmin
+Horizon : 10.89.201.2 (hostname: pyro-horizon, no domain name)
+Core: 10.89.201.1 (hostname: pyro-core, no domain name)
+Store: 10.89.201.3 (hostname: pyro-store, no domain name)
+Database: 10.89.201.4 (hostname: pyro-database, no domain name)
   ```
 6. Once the VM are running, before connecting to them, make sure to make them launch automatically when the server boots:
 

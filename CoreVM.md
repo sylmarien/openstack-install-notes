@@ -8,8 +8,6 @@ Go to:
 - [Nova Configuration](#nova-configuration)
 - [Neutron Configuration](#neutron-configuration)
 
-**During development, all passwords are _localadmin_.**
-
 ## Basic configuration
 
 Basic configuration is described in the [Controller.md](https://github.com/sylmarien/openstack-install-notes/blob/master/Controller.md) file. It is the shared configuration between all the VMs of the controller node.

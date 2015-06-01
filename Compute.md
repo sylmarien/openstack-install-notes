@@ -4,8 +4,6 @@
 
 This file contains notes on the Compute nodes of the architecture. Among others, the purpose of this document is to take track of the OpenStack components, and each modules of these components specifically, that are installed on the Controller node.
 
-**During development, all passwords are _localadmin_.**
-
 ## Basic environment
 
 The network configuration for these nodes is the following:  
