@@ -15,6 +15,8 @@ Especially, it follows the documentation for the Juno release, but we may decide
 
 #### [Overview.md](Overview.md)
 
+Overview of the installation.
+
 ### Nodes and Virtual Machines
 
 #### [Controller.md](Controller.md)
