@@ -65,3 +65,7 @@ This file contains notes on the install procedure for the Neutron module of Open
 #### [Horizon.md](https://github.com/sylmarien/openstack-install-notes/blob/master/Horizon.md)
 
 This file contains notes on the install procedure for the Horizon module of OpenStack.
+
+#### [Cinder.md](https://github.com/sylmarien/openstack-install-notes/blob/master/Cinder.md)
+
+This file contains notes on the install procedure for the Cinder module of OpenStack.
