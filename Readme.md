@@ -13,59 +13,56 @@ Especially, it follows the documentation for the Juno release, but we may decide
 
 ## Files description
 
-#### [OpenStackNotes.md](https://github.com/sylmarien/openstack-install-notes/blob/master/OpenStackNotes.md "OpenStackNotes.md")
-
-This file contains diverses notes and comments on the installation as a whole. Its main purpose is to describe the architecture and some specificity it could have.  
-During the development period it also contains reminders on topics to dig further and reflexions I'm having that may (or may not) make it to the implementation/release.
+#### [Overview.md](Overview.md)
 
 ### Nodes and Virtual Machines
 
-#### [Controller.md](https://github.com/sylmarien/openstack-install-notes/blob/master/Controller.md)
+#### [Controller.md](Controller.md)
 
 This file contains notes on the Controller node of the architecture.
 
-##### [HorizonVM.md](https://github.com/sylmarien/openstack-install-notes/blob/master/HorizonVM.md)
+##### [HorizonVM.md](HorizonVM.md)
 
 This file contains notes on the Horizon VM of the architecture. Among others, the purpose of this document is to take track of the OpenStack components, and each modules of these components specifically, that are installed on the Horizon VM.
 
-##### [CoreVM.md](https://github.com/sylmarien/openstack-install-notes/blob/master/CoreVM.md)
+##### [CoreVM.md](CoreVM.md)
 
 This file contains notes on the Horizon VM of the architecture. Among others, the purpose of this document is to take track of the OpenStack components, and each modules of these components specifically, that are installed on the Core VM.
 
-##### [StoreVM.md](https://github.com/sylmarien/openstack-install-notes/blob/master/StoreVM.md)
+##### [StoreVM.md](StoreVM.md)
 
 This file contains notes on the Horizon VM of the architecture. Among others, the purpose of this document is to take track of the OpenStack components, and each modules of these components specifically, that are installed on the Store VM.
 
-##### [DatabaseVM.md](https://github.com/sylmarien/openstack-install-notes/blob/master/DatabaseVM.md)
+##### [DatabaseVM.md](DatabaseVM.md)
 
 This file contains notes on the Horizon VM of the architecture. Among others, the purpose of this document is to take track of the OpenStack components, and each modules of these components specifically, that are installed on the Database VM.
 
-#### [Compute.md](https://github.com/sylmarien/openstack-install-notes/blob/master/Compute.md)
+#### [Compute.md](Compute.md)
 
 This file contains notes on the Compute node of the architecture. Among others, the purpose of this document is to take track of the OpenStack components, and each modules of these components specifically, that are installed on the Compute node.
 
 ### Services
 
-#### [Keystone.md](https://github.com/sylmarien/openstack-install-notes/blob/master/Keystone.md)
+#### [Keystone.md](Keystone.md)
 
 This file contains notes on the install procedure for the Keystone module of OpenStack.
 
-#### [Glance.md](https://github.com/sylmarien/openstack-install-notes/blob/master/Glance.md)
+#### [Glance.md](Glance.md)
 
 This file contains notes on the install procedure for the Glance module of OpenStack.
 
-#### [Nova.md](https://github.com/sylmarien/openstack-install-notes/blob/master/Nova.md)
+#### [Nova.md](Nova.md)
 
 This file contains notes on the install procedure for the Nova module of OpenStack.
 
-#### [Neutron.md](https://github.com/sylmarien/openstack-install-notes/blob/master/Neutron.md)
+#### [Neutron.md](Neutron.md)
 
 This file contains notes on the install procedure for the Neutron module of OpenStack.
 
-#### [Horizon.md](https://github.com/sylmarien/openstack-install-notes/blob/master/Horizon.md)
+#### [Horizon.md](Horizon.md)
 
 This file contains notes on the install procedure for the Horizon module of OpenStack.
 
-#### [Cinder.md](https://github.com/sylmarien/openstack-install-notes/blob/master/Cinder.md)
+#### [Cinder.md](Cinder.md)
 
 This file contains notes on the install procedure for the Cinder module of OpenStack.
