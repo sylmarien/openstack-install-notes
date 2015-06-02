@@ -19,7 +19,6 @@ http://docs.openstack.org/juno/install-guide/install/apt/content/neutron-control
 
 **Core VM:**
 - neutron-server
-- neutron-plugin-ml2
 - python-neutronclient
 - python-mysqldb
 
