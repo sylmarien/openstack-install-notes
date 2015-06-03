@@ -21,7 +21,7 @@ The OpenStack installation is done in the 10.89.0.0/16 subnet where the address 
 10.89.201.[0-254] : OpenStack services Virtual Machines
 10.89.210.[0-254] : Data network
 
-10.89.[1-199].[0-254] : Floating IPs network
+10.89.[1-199].[0-254] : Floating IPs network  
 192.168.1.0/24 : etriks tenant subnet (Private IPs)
 
 ## Service map
