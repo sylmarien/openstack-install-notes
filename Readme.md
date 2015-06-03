@@ -68,3 +68,7 @@ This file contains notes on the install procedure for the Horizon module of Open
 #### [Cinder.md](Cinder.md)
 
 This file contains notes on the install procedure for the Cinder module of OpenStack.
+
+### LCSB - eTRIKS specific
+
+#### [eTRIKS specific settings](etriks.md)
