@@ -7,10 +7,6 @@ Note that this is **not** a user documentation, it is destined to system adminis
 Each file contains notes regarding either  a specific component of OpenStack or a node of the Architecture.  
 The OpenStackNotes.md file is a bit appart from the others, since it contains general informations on the project (notably the architecture).
 
-***Important note: This repository is a Work In Progress. Therefore, some files may be listed below but not be actually present in the repository. They will be as soon as the deployment of the corresponding component attains a state from which reliable information can be taken.  
-Moreover, the presence of a file does not mean that it is in a final/release state. Information may be incomplete or contain some errors and therefore may change in later versions.  
-Especially, it follows the documentation for the Juno release, but we may decide to deploy the Icehouse release due to a longer support (5 years instead of 1.5 years). In this cas, some (minor) modifications would be necessary to deploy OpenStack.***
-
 ## Files description
 
 #### [Overview.md](Overview.md)
