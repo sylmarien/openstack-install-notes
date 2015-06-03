@@ -26,7 +26,7 @@ The OpenStack installation is done in the 10.89.0.0/16 subnet where the address 
 
 ## Service map
 
-![Service map](images/service-map.png)
+![Service map](images/service-map-v1.png)
 
 ## Extension guidelines
 
