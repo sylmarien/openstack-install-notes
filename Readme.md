@@ -72,3 +72,11 @@ This file contains notes on the install procedure for the Cinder module of OpenS
 ### LCSB - eTRIKS specific
 
 #### [eTRIKS specific settings](etriks.md)
+
+This file contains configuration details specific to eTRIKS.
+
+### Issues
+
+#### [Issues](issues.md)
+
+This file tracks issues encountered as well as the solution applied to solve them.
