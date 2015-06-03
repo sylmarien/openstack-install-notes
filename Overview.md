@@ -17,8 +17,8 @@ Go to:
 
 The OpenStack installation is done in the 10.89.0.0/16 subnet where the address repartition is as follow:
 
-10.89.200.[0-254] : Physical servers
-10.89.201.[0-254] : OpenStack services Virtual Machines
+10.89.200.[0-254] : Physical servers  
+10.89.201.[0-254] : OpenStack services Virtual Machines  
 10.89.210.[0-254] : Data network
 
 10.89.[1-199].[0-254] : Floating IPs network  
