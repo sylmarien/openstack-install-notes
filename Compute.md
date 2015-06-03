@@ -9,7 +9,7 @@ This file contains notes on the Compute nodes of the architecture. Among others,
 The network configuration for these nodes is the following:  
 
 - em1: 10.89.200.11->14
-- em2: 10.89.210.11->14
+- p2p1: 10.89.210.11->14
 
 **Configure networking**
 
