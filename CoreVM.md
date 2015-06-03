@@ -47,9 +47,6 @@ We use RabbitMQ as message broker service.
   `rabbitmqctl change_password guest RABBIT_PASS`  
   Replacing _RABBIT_PASS_ with a suitable password.
 
-**Note:** During development, we use the guest account that is automatically created by RabbitMQ, but for production, we should create a unique user with suitable password.  
-Then, we would have to configure the _rabbit_userid_ and _rabbit_password_ keys accordingly in the configuration files of each OpenStack service that use the message broker.
-
 ## Keystone Configuration
 
 Follow instructions at [keystone.md](Keystone.md).
