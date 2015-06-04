@@ -13,7 +13,7 @@ DELL R620
 - 4x 1GbE, 2x 10GbE, 1x IB QDR (Mellanox ConnectX-3)
 
 
-## Compute nodes
+## Compute nodes (x4)
 
 DELL R620
 - 2x Xeon E5-2660v2 (2.2GHz, 10 cores, 25Mo cache)

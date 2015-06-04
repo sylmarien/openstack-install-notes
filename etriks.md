@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document keeps track of the various information specific to eTRIKS such as the access configuration and the details of the running services.
+This document tracks the various information specific to eTRIKS such as the access configuration and the details of the running services.
 
 ## Access configuration
 
