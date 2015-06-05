@@ -637,9 +637,9 @@ The external network typically provides Internet access for your instances. By d
     ```
     neutron subnet-create ext-net --name ext-subnet --allocation-pool start=FLOATING_IP_START,end=FLOATING_IP_END --disable-dhcp --gateway EXTERNAL_NETWORK_GATEWAY EXTERNAL_NETWORK_CIDR
     ```  
-    Replacing _FLOATING_IP_START_ (10.89.0.2) and _FLOATING_IP_END_ (10.89.199.254) with the first and last IP addresses of the range that you want to allocate for floating IP addresses. Replace _EXTERNAL_NETWORK_CIDR_ (10.89.0.0/16) with the subnet associated with the physical network. Replace _EXTERNAL_NETWORK_GATEWAY_ (10.89.0.1) with the gateway associated with the physical network, typically the ".1" IP address. You should disable DHCP on this subnet because instances do not connect directly to the external network and floating IP addresses require manual assignment.
+    Replacing _FLOATING_IP_START_ (10.89.1.0) and _FLOATING_IP_END_ (10.89.199.254) with the first and last IP addresses of the range that you want to allocate for floating IP addresses. Replace _EXTERNAL_NETWORK_CIDR_ (10.89.0.0/16) with the subnet associated with the physical network. Replace _EXTERNAL_NETWORK_GATEWAY_ (10.89.0.1) with the gateway associated with the physical network, typically the ".1" IP address. You should disable DHCP on this subnet because instances do not connect directly to the external network and floating IP addresses require manual assignment.
 2. Tenant network. **On the core VM**  
-The tenant network provides internal network access for instances. The architecture isolates this type of network from other tenants. The demo tenant owns this network because it only provides network access for instances within it.
+The tenant network provides internal network access for instances. The architecture isolates this type of network from other tenants. The tenant owns this network because it only provides network access for instances within it. **You have to execute these commands as the tenant who will use them.**
   1. Create the tenant network:  
     `neutron net-create etriks-net`
   2. Create a subnet on the tenant network:
