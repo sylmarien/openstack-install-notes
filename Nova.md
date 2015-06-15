@@ -12,6 +12,7 @@ As of now, I follow the instructions of the documentation at this page:
 Go to:  
 [Core VM installation](Nova.md#core-vm-installation)  
 [Compute node installation](Nova.md#compute-node-installation)
+[Post installation configuration](#post-installation-configuration)
 
 #### List of installed modules by node
 **Controller side:**
@@ -126,7 +127,15 @@ Go to:
         ...
         glance_host = pyro-store
         ```
-    6. Set the logging to verbose for troubleshooting purpose (optional):
+    6. Configure scheduler to ensure filters based on aggregates will work:
+
+        ```
+        [DEFAULT]
+        ...
+        scheduler_driver=nova.scheduler.filter_scheduler.FilterScheduler
+        scheduler_default_filters = AggregateInstanceExtraSpecsFilter,RetryFilter,AvailabilityZoneFilter,RamFilter,ComputeFilter,ComputeCapabilitiesFilter,ImagePropertiesFilter,ServerGroupAntiAffinityFilter,ServerGroupAffinityFilter
+        ```
+    7. Set the logging to verbose for troubleshooting purpose (optional):
     
         ```
         [DEFAULT]
@@ -238,3 +247,42 @@ If this command returns a value of zero, your compute node does not support hard
     `rm -f /var/lib/nova/nova.sqlite`
 5. Restart the Compute service:  
     `service nova-compute restart`
+
+#### Post installation configuration
+
+To segregate access to various compute nodes to specific tenants, we have to use the notion of aggregates.
+
+1. Create a default aggregate that will contain all the nodes that are shared between all tenants:
+    
+    ```
+    nova aggregate-create default AVAILABILITY_ZONE
+    ```
+    Where _AVAILABILITY_ZONE_ is the availability zone you're working on.
+
+2. Add the shared compute nodes to this aggregate (in our case currently: none):
+
+    ```
+    nova aggregate-add-host AGGREGATE_ID HOST_NAME
+    ```
+    Where _AGGREGATE_ID_ is the id of the _default_ aggregate and _HOST_NAME_ the name of the compute node.
+3. Create a tenant-specific aggregate:
+
+    ```
+    nova aggregate-create AGGREGATE_NAME AVAILABILITY_ZONE
+    ```
+    Where _AGGREGATE_NAME_ is the name of the aggregate (most likely the name of the tenant that will be able to use it) and _AVAILABILITY_ZONE_ the availability zone your working on.
+4. Set the metadata to restrict usage to the said tenant:
+
+    ```
+    nova aggregate-set-metadata AGGREGATE_ID project_id=TENANT_ID
+    ```
+    Where _AGGREGATE_ID_ is the id of this aggregate and _TENANT_ID_ is the id of the said tenant.
+5. Add the host that will be only usable by this tenant to the aggregate:
+
+    ```
+    nova aggregate-add-host AGGREGATE_ID HOST_NAME
+    ```
+    Where _AGGREGATE_ID_ is the id of this aggregate and _HOST_NAME_ the name of the compute node.
+
+
+After this, hosts in a tenant-specific aggregate will only be used to launch instances if the user is in the appropriate tenant.
