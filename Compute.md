@@ -102,3 +102,7 @@ Install the packages:
 ## Nova configuration
 
 Follow instructions at [Nova.md](Nova.md#compute-node-installation)
+
+## Neutron configuration
+
+Follow instructions at [Neutron.md](Neutron.md#compute-node-install)
