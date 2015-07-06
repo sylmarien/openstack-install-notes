@@ -232,6 +232,13 @@ Go to:
         ...
         verbose=True
         ```
+    7. Change the path where images and root disks will be stored:
+    
+        ```
+        [DEFAULT]
+        ...
+        state_path=/store/nova
+        ```
 3. Determine whether your compute node supports hardware acceleration for virtual machines:  
     `egrep -c '(vmx|svm)' /proc/cpuinfo` or `kvm-ok`  
 If this command returns a value of one or greater, your compute node supports hardware acceleration which typically requires no additional configuration.  
