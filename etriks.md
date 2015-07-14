@@ -36,4 +36,4 @@ Test flavors for Bio (b) related VMs (flavor name, auto-generate ID, memory in M
          nova flavor-create b2.2xmedium  auto    64716   40      4
          nova flavor-create b2.4xmedium  auto    129434  80      8
          nova flavor-create b2.large     auto    161792  100     10
-         nova flavor-create b2.xlarge    auto    323584  200     20
+         nova flavor-create b2.xlarge    auto    315392  200     20
