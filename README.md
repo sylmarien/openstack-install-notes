@@ -13,7 +13,11 @@ The OpenStackNotes.md file is a bit appart from the others, since it contains ge
 
 Overview of the installation.
 
-### Nodes and Virtual Machines
+### [Basic usage guide](#basic-usage.md)
+
+This file contains the main steps to create a new tenant with its users and important components.
+
+### Nodes and Virtual Machines Configuration
 
 #### [Controller.md](Controller.md)
 
@@ -39,7 +43,7 @@ This file contains notes on the Horizon VM of the architecture. Among others, th
 
 This file contains notes on the Compute node of the architecture. Among others, the purpose of this document is to take track of the OpenStack components, and each modules of these components specifically, that are installed on the Compute node.
 
-### Services
+### Services Configuration
 
 #### [Keystone.md](Keystone.md)
 
