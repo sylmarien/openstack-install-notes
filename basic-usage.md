@@ -61,3 +61,8 @@ where _TENANT_NAME_ is the name of the tenant created arlier, _USER_NAME_ the na
         neutron router-gateway-set ROUTER_NAME ext-net
         ```
         where _ROUTER_NAME_ is the name of the previously created router.
+    6. You then have to change the security groups rules to allow some interaction with the instances that will be created on the networks (Has to be made for each tenant). Here is a non exhaustive list of rules that can be considered:
+
+    - To authorize pinging to and from an instance: authorize Egress and Ingress ICMP communications
+    - To authorize ssh connection to the instances: authorize Ingress TCP communication on port 22.
+    - To authorize DHCP communication with the DHCP server: authorize Egress UDP communication on port 67 and Ingress UDP communication on port 68. (Ingress port may need to be adapted depending on your instance configuration)
