@@ -255,7 +255,7 @@ If this command returns a value of zero, your compute node does not support hard
 5. Restart the Compute service:  
     `service nova-compute restart`
 
-#### Post installation configuration
+#### Post installation configuration (Not used. Given to give some background if implemented at some point.)
 
 To segregate access to various compute nodes to specific tenants, we have to use the notion of aggregates.
 
