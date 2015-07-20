@@ -117,7 +117,7 @@ Go to:
         vncserver_listen = MANAGEMENT_IP_ADDRESS
         vncserver_proxyclient_address = MANAGEMENT_IP_ADDRESS
         novncproxy_port=8080
-        novncproxy_base_url = http://pyro-core:8080/vnc_auto.html
+        novncproxy_base_url = http://pyro-core.uni.lu:8080/vnc_auto.html
         ```  
         Replacing _MANAGEMENT_IP_ADDRESS_ with the IP address of the management interface. (10.89.201.1 in this temporary configuration).
     5. Configure the location of the Image service:
